@@ -31,8 +31,8 @@ module SimpleStateMachine
         state_machine  = self.class.state_machine
         if @next_state = state_machine.events[event_name][@state]
           result = send("without_managed_state_#{event_name}", *args)
-          if @__cancel_event
-            @__cancel_event = false
+          if @__cancel_state_transition
+            @__cancel_state_transition = false
           else
             @state = @next_state
             send :state_transition_succeeded_callback
@@ -67,8 +67,8 @@ module SimpleStateMachine
     def state_transition_succeeded_callback
     end
     
-    def cancel_event
-      @__cancel_event = true
+    def cancel_state_transition
+      @__cancel_state_transition = true
     end
   
   end
@@ -134,41 +134,37 @@ class User
   extend SimpleStateMachine
 
   def initialize
-    @state = :signed_up
+    @state = :new
   end
 
+  def send_activation_code
+    self.activation_code = SHA::Digest.hexdigest("salt #{Time.now.to_f}")
+    if send_activation_email(self.activation_code)
+      self.activation_code
+    else
+      cancel_state_transition
+      self.activation_code = nil
+    end
+  end
+  event :send_activation_code, :new => :waiting_for_activation
+    
   def confirm_activation_code activation_code
     if self.activation_code != activation_code
       self.errors[:activation_code] = "Invalid" 
     end
   end
-  event :confirm_activation_code, :signed_up => :sign_up_complete
+  event :confirm_activation_code, :waiting_for_activation => :active
   
-  def send_passord_change_confirmation
-    if send_email
-      true
-    else
-      cancel_event
-      false
-    end
+  def log_send_activation_code_failed
   end
-  event :send_passord_change_confirmation, :sign_up_complete => :changing_password
+  event :log_send_activation_code_failed, :new => :send_activation_code_failed
 
-  def log_email_error
+  def reset_password(new_password)
+    self.password = new_password
   end
-  event :log_email_error, :sign_up_complete => :send_email_failed
+  # do not change state, but ensure that we are in proper state
+  event :reset_password, :active => :active
   
-  def reset_password(with_managed_state_password)
-    self.password = with_managed_state_password
-  end
-  event :reset_password, :changing_password => :sign_up_complete
-  
-  
-  def cancel_reset
-    # do nothing
-  end
-  event :cancel_reset, :changing_password => :sign_up_complete
-
   def state
     @state
   end
@@ -176,22 +172,21 @@ class User
 end
 
 user = User.new
-puts user.state
+user.state.should == :new
+
+if user.send_activation_code '123'
+  user.state.should == :waiting_for_activation
+else
+  user.log_email_error
+  user.state.should == :send_activation_code_failed
+end  
 
 # raises error
 user.reset_password('foo')
-user.errors['state'].should == 'cannot reset_password if signed_up'
+# user.errors['state'].should == 'cannot reset_password if waiting_for_activation'
 
 user.confirm_activation_code '123'
-user.state.should == :sign_up_complete
-
-if user.send_passord_change_confirmation
-else
-  user.log_email_error
-end
-
-user.send_passord_change_confirmation
-user.state.should == :changing_password
+user.state.should == :active
 
 user.reset_password('foo')
-user.state.should == :sign_up_complete
+user.state.should == :active
