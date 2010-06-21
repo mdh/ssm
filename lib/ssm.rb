@@ -1,0 +1,1 @@
+require 'ssm/ssm'
