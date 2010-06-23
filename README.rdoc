@@ -4,36 +4,37 @@ A Ruby Statemachine that focuses on events instead of states.
 Instead of using a DSL to define events, we decorate existing methods with checks to see if state transitions are allowed.
 
 This has a couple of advantages:
-- Arguments can be passed to events
-- Validation errors can be set on the model if your using ActiveRecord
-- Encapsulate state transitions. (No need for :guards)
+- Arguments can be passed to events,
+- Validation errors can be set on the model if you are using ActiveRecord,
+- Encapsulate state transitions (no need for :guards).
 
-  
-  class Lamp
+==== Example usage
 
-    attr_reader :state
+class Lamp
 
-    extend SimpleStateMachine
+  attr_reader :state
 
-    def initialize
-      @state = :off
-    end
+  extend SimpleStateMachine
 
-    def push_button1
-      puts 'click1'
-      puts @state
-    end
-    event :push_button1, :off => :on, 
-                         :on  => :off
-
-    def push_button2
-      puts 'click2'
-      puts @state
-    end
-    event :push_button2, :off => :on,
-                         :on  => :off
-
+  def initialize
+    @state = :off
   end
+
+  def push_button1
+    puts 'click1'
+    puts @state
+  end
+  event :push_button1, :off => :on,
+                       :on  => :off
+
+  def push_button2
+    puts 'click2'
+    puts @state
+  end
+  event :push_button2, :off => :on,
+                       :on  => :off
+
+end
 
 
 == Note on Patches/Pull Requests
@@ -48,4 +49,4 @@ This has a couple of advantages:
 
 == Copyright
 
-Copyright (c) 2010 Petrik. See LICENSE for details.
+Copyright (c) 2010 Marek & Petrik. See LICENSE for details.
