@@ -1,12 +1,12 @@
 = SimpleStateMachine
 
-A Ruby Statemachine that focusses on events instead of states.
-Instead of using a DSL for events we decorate existing methods with checks to see if state transitions are allowed.
+A Ruby Statemachine that focuses on events instead of states.
+Instead of using a DSL to define events, we decorate existing methods with checks to see if state transitions are allowed.
 
-This allows us to:
-- Pass arguments
-- Add errors to the model if your using ActiveRecord
-- 
+This has a couple of advantages:
+- Arguments can be passed to events
+- Validation errors can be set on the model if your using ActiveRecord
+- Encapsulate state transitions. (No need for :guards)
 
   class Lamp
 
