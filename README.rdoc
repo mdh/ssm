@@ -25,6 +25,11 @@ This has a couple of advantages:
 - Validation errors can be set on the model if you are using ActiveRecord / ActiveModel,
 - Encapsulate state transitions (no need for :guards).
 
+To use the code, you need to do 3 things:
+- extend SimpleStateMachine,
+- set the initial state in an instance variable named @state,
+- decorate a method with the [\+event+] DSL
+
 ==== Example usage
 
   class Lamp
