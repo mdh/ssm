@@ -8,6 +8,7 @@ This has a couple of advantages:
 - Validation errors can be set on the model if your using ActiveRecord
 - Encapsulate state transitions. (No need for :guards)
 
+  
   class Lamp
 
     attr_reader :state
