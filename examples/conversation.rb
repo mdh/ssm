@@ -21,11 +21,10 @@
 # end
 
 class Conversation
-  attr_reader :state
   extend SimpleStateMachine
 
   def initialize
-    @state = :unread
+    set_initial_state(:unread)
   end
 
   def view; end

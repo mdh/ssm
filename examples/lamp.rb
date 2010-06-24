@@ -1,11 +1,9 @@
 class Lamp
-  
-  attr_reader :state
-    
+      
   extend SimpleStateMachine
 
   def initialize
-    @state = :off
+    set_initial_state(:off)
   end
   
   def push_button1

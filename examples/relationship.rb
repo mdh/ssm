@@ -31,11 +31,10 @@
 # end
 
 class Relationship
-  attr_reader :state
   extend SimpleStateMachine
   
   def initialize
-    @state = relationship.strictly_for_fun? ? get_intimate : start_dating
+    set_initial_state(relationship.strictly_for_fun? ? get_intimate : start_dating)
   end
 
   def start_dating

@@ -1,13 +1,12 @@
 require 'digest/sha1'
 class User
   
-  attr_reader :state
   attr_accessor :activation_code
   
   extend SimpleStateMachine
 
   def initialize
-    @state = :new
+    @state = 'new'
   end
 
   def send_activation_code

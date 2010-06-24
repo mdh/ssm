@@ -1,11 +1,9 @@
 class TrafficLight
   
-  attr_reader :state
-  
   extend SimpleStateMachine
   
   def initialize
-    @state = :green
+    set_initial_state(:green)
   end
 
   # state machine events
