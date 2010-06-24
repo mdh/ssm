@@ -1,14 +1,37 @@
 = SimpleStateMachine
 
 A Ruby Statemachine that focuses on events instead of states.
-Instead of using a DSL to define events, we decorate existing methods with checks to see if state transitions are allowed.
+
+A state machine should help you:
+- Encapsulate state,
+- Guard state transitions,
+- Make it trivial to add state transitions to any method.
+
+Instead of using a DSL to define events, we use a different approach.
+We have a very simple DSL to decorate existing methods with logic that guards 
+state transitions.
+
+==== example
+
+  def activate_account(activation_code)
+    # logic that checks activation_code here
+  end
+  event :activate_account, :pending => :active
+
 
 This has a couple of advantages:
-- Arguments can be passed to events
-- Validation errors can be set on the model if your using ActiveRecord
-- Encapsulate state transitions. (No need for :guards)
+- Arguments can be passed to 'events',
+- 'events' can return a value, remember, it's just a method,
+- Validation errors can be set on the model if you are using ActiveRecord / ActiveModel,
+- Encapsulate state transitions (no need for :guards).
 
-  
+To use the code, you need to do 3 things:
+- extend SimpleStateMachine,
+- set the initial state in an instance variable named @state,
+- decorate a method with the event DSL
+
+==== Example usage
+
   class Lamp
 
     attr_reader :state
@@ -23,7 +46,7 @@ This has a couple of advantages:
       puts 'click1'
       puts @state
     end
-    event :push_button1, :off => :on, 
+    event :push_button1, :off => :on,
                          :on  => :off
 
     def push_button2
@@ -35,6 +58,7 @@ This has a couple of advantages:
 
   end
 
+This code was just released, we do not claim it to be stable.
 
 == Note on Patches/Pull Requests
  
@@ -48,4 +72,4 @@ This has a couple of advantages:
 
 == Copyright
 
-Copyright (c) 2010 Petrik. See LICENSE for details.
+Copyright (c) 2010 Marek & Petrik. See LICENSE for details.
