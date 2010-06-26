@@ -22,6 +22,8 @@ module SimpleStateMachine
       @events[event_name] ||= {}
       state_transitions.each do |from, to|
         @events[event_name][from.to_s] = to.to_s
+        define_state_helper_method from
+        define_state_helper_method to
         unless @subject.method_defined?("with_managed_state_#{event_name}")
           decorate_event_method(event_name) 
         end
@@ -39,6 +41,12 @@ module SimpleStateMachine
       @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
       @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
       @subject.send :include, InstanceMethods
+    end
+    
+    def define_state_helper_method state
+      @subject.send(:define_method, "#{state.to_s}?") do
+        @state == state.to_s || self.state == state.to_s
+      end
     end
     
   end
