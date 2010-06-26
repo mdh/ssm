@@ -6,7 +6,7 @@ class User
   extend SimpleStateMachine
 
   def initialize
-    @state = 'new'
+    set_initial_state(:new)
   end
 
   def send_activation_code
