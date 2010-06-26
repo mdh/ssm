@@ -4,7 +4,7 @@ class WithoutEventMethods
   extend SimpleStateMachine
 
   def initialize
-    set_initial_state(:unread)
+    self.state = 'unread'
   end
   event :view, :unread => :read
   
@@ -14,7 +14,7 @@ class WithPredefinedStateHelperMethods
   extend SimpleStateMachine
 
   def initialize
-    set_initial_state(:unread)
+    self.state = 'unread'
   end
   event :view, :unread => :read
 

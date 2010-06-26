@@ -3,7 +3,7 @@ class TrafficLight
   extend SimpleStateMachine
   
   def initialize
-    set_initial_state(:green)
+    self.state = 'green'
   end
 
   # state machine events

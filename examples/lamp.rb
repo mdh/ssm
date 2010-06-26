@@ -3,7 +3,7 @@ class Lamp
   extend SimpleStateMachine
 
   def initialize
-    set_initial_state(:off)
+    self.state = 'off'
   end
   
   def push_button1

@@ -153,10 +153,6 @@ module SimpleStateMachine
   
   module InstanceMethods
     
-    def set_initial_state(state)
-      self.state = state
-    end
-    
     def state_machine
       @state_machine ||= StateMachine.new(self)
     end

@@ -34,7 +34,7 @@ class Relationship
   extend SimpleStateMachine
   
   def initialize
-    set_initial_state(relationship.strictly_for_fun? ? get_intimate : start_dating)
+    self.state = relationship.strictly_for_fun? ? get_intimate : start_dating
   end
 
   def start_dating
