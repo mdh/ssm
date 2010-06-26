@@ -14,7 +14,7 @@ end
 
 describe SimpleStateMachine do
   
-  it "has a default state nil" do
+  it "has a default state" do
     SimpleExample.new.state.should == 'state1'
   end
 

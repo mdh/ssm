@@ -33,8 +33,13 @@ module SimpleStateMachine
     def initialize(subject)
       @subject = subject
       @subject.send :include, InstanceMethods
-      define_state_getter_method
-      define_state_setter_method
+      @active_record = @subject.ancestors.map {|klass| klass.to_s}.include?("ActiveRecord::Base")
+      if @active_record
+        @subject.send :include, ActiveRecordInstanceMethods
+      else
+        define_state_getter_method
+        define_state_setter_method
+      end
     end
 
     def decorate from, to, event_name
@@ -66,6 +71,11 @@ module SimpleStateMachine
         unless @subject.method_defined?("#{event_name}")
           @subject.send(:define_method, "#{event_name}") {}
         end
+        if @active_record
+          unless @subject.method_defined?("#{event_name}!")
+            @subject.send(:define_method, "#{event_name}!") {}
+          end
+        end
       end
     
       def define_state_helper_method state
@@ -87,6 +97,18 @@ module SimpleStateMachine
           @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
           @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
         end
+        if @active_record
+          unless @subject.method_defined?("with_managed_state_#{event_name}!")
+            @subject.send(:define_method, "with_managed_state_#{event_name}!") do |*args|
+              state_machine  = self.class.state_machine
+              return ssm_transition!(event_name, state, state_machine.events[event_name][state]) do
+                send("without_managed_state_#{event_name}!", *args)
+              end
+            end
+            @subject.send :alias_method, "without_managed_state_#{event_name}!", "#{event_name}!"
+            @subject.send :alias_method, "#{event_name}!", "with_managed_state_#{event_name}!"
+          end
+        end
       end
     
   end
@@ -105,10 +127,14 @@ module SimpleStateMachine
           @next_state = to
           result = yield
           self.state = to
+          send :state_transition_succeeded_callback
+          result
         else
           send :illegal_state_transition_callback, event_name
         end
-        result
+      end
+
+      def state_transition_succeeded_callback
       end
     
       def illegal_state_transition_callback event_name
@@ -117,32 +143,34 @@ module SimpleStateMachine
       end
   end
 
-  # module ActiveRecordInstanceMethods
-  # 
-  #   def ssm_transition(event_name, from, to)
-  #     if to
-  #       @next_state = to
-  #       result = yield
-  #       if @__cancel_state_transition
-  #         @__cancel_state_transition = false
-  #       else
-  #         self.state = to
-  #         send :state_transition_succeeded_callback, @state
-  #       end
-  #     else
-  #       # implement your own logic: i.e. set errors in active validations
-  #       send :illegal_state_transition_callback, event_name
-  #     end
-  #     result
-  #   end
-  # 
-  #   def state_transition_succeeded_callback(state)
-  #   end
-  #   
-  #   def cancel_state_transition
-  #     @__cancel_state_transition = true
-  #   end
-  # 
-  # end
+  module ActiveRecordInstanceMethods
+
+    private
+    
+      def ssm_transition!(event_name, from, to)
+        if to
+          @next_state = to
+          result = yield
+          self.state = to
+          send :state_transition_succeeded_callback!
+          result
+        else
+          send :illegal_state_transition_callback, event_name
+        end
+      end
+
+      def state_transition_succeeded_callback
+        save
+      end
+
+      def state_transition_succeeded_callback!
+        save!
+      end
+    # 
+    # def cancel_state_transition
+    #   @__cancel_state_transition = true
+    # end
+  
+  end
 
 end

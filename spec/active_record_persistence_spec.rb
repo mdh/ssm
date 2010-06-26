@@ -10,6 +10,7 @@ def setup_db
   ActiveRecord::Schema.define(:version => 1) do
     create_table :accounts do |t|
       t.column :id, :integer
+      t.column :name, :string
       t.column :state, :string
       t.column :created_at, :datetime
       t.column :updated_at, :datetime
@@ -25,6 +26,8 @@ end
 
 class Account < ActiveRecord::Base
 
+  validates_presence_of :name
+
   def after_initialize
     self.state ||= 'pending'
   end
@@ -38,7 +41,9 @@ class Account < ActiveRecord::Base
                   :disabled => :enabled
   event :disable, :enabled  => :disabled
 
-  def send_enabled_email; end
+  def send_enabled_email
+    "email sent"
+  end
 
 end
 
@@ -52,15 +57,39 @@ describe Account do
     teardown_db
   end
   
-  it "should have a default state" do
+  it "has a default state" do
     Account.new.should be_pending
   end
   
-  describe "enable" do
-    it "should transition from pending to enabled" do
-      account = Account.create
+  describe "events" do
+    it "can transition from pending to enabled" do
+      account = Account.create!(:name => 'name')
       account.enable
-      account.reload.should be_enabled
+      Account.find(account.id).should be_enabled
+    end
+
+    it "can transition from pending to enabled with !" do
+      account = Account.create!(:name => 'name')
+      account.enable!
+      Account.find(account.id).should be_enabled
+    end
+
+    it "raises an error if an invalid state_transition is called" do
+      account = Account.create!(:name => 'name')
+      l = lambda { account.disable }
+      l.should raise_error(RuntimeError, "You cannot 'disable' when state is 'pending'")
+    end
+
+    it "raises a RecordInvalid if called with ! and record is invalid" do
+      account = Account.new
+      l = lambda { account.enable! }
+      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
+    end
+
+    it "returns the event_method return statement" do
+      account = Account.create!(:name => 'name')
+      account.enable.should == 'email sent'
+      account.disable.should be_nil
     end
   end
 

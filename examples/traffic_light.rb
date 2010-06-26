@@ -8,7 +8,7 @@ class TrafficLight
 
   # state machine events
   def change_state
-    puts "#{@state} => #{@next_state}"
+    puts "#{state} => #{@next_state}"
   end
 
   event :change_state, :green  => :orange,
