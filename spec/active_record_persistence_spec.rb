@@ -59,14 +59,14 @@ describe Account do
   end
   
   it "should have a default state" do
-    Account.new.state.should == 'pending'
+    Account.new.should be_pending
   end
   
   describe "enable" do
     it "should transition from pending to enabled" do
       account = Account.create
       account.enable
-      account.reload.state.should == 'enabled'
+      account.reload.should be_enabled
     end
   end
 
