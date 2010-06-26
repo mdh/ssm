@@ -14,20 +14,33 @@ module SimpleStateMachine
     attr_reader :events
 
     def initialize subject
-      @subject = subject
+      @decorator = Decorator.new(subject)
       @events  = {}
-      @subject.send :include, InstanceMethods
     end
     
     def register_event event_name, state_transitions
       @events[event_name] ||= {}
       state_transitions.each do |from, to|
         @events[event_name][from.to_s] = to.to_s
-        define_state_helper_method(from)
-        define_state_helper_method(to)
-        define_event_method(event_name)
-        decorate_event_method(event_name)
+        @decorator.decorate(from, to, event_name)
       end
+    end
+
+    
+  end
+  
+  class Decorator
+
+    def initialize(subject)
+      @subject = subject
+      @subject.send :include, InstanceMethods
+    end
+
+    def decorate from, to, event_name
+      define_state_helper_method(from)
+      define_state_helper_method(to)
+      define_event_method(event_name)
+      decorate_event_method(event_name)
     end
 
     def define_event_method event_name
@@ -58,6 +71,7 @@ module SimpleStateMachine
     end
     
   end
+  
   
   module InstanceMethods
     
