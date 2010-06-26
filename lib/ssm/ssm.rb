@@ -97,23 +97,24 @@ module SimpleStateMachine
     def set_initial_state(state)
       self.state = state
     end
-  
-    def ssm_transition(event_name, from, to)
-      if to
-        @next_state = to
-        result = yield
-        self.state = to
-      else
-        # implement your own logic: i.e. set errors in active validations
-        send :illegal_state_transition_callback, event_name
-      end
-      result
-    end
+
+    private
     
-    def illegal_state_transition_callback event_name
-      # override with your own implementation, like setting errors in your model
-      raise "You cannot '#{event_name}' when state is '#{state}'"
-    end
+      def ssm_transition(event_name, from, to)
+        if to
+          @next_state = to
+          result = yield
+          self.state = to
+        else
+          send :illegal_state_transition_callback, event_name
+        end
+        result
+      end
+    
+      def illegal_state_transition_callback event_name
+        # override with your own implementation, like setting errors in your model
+        raise "You cannot '#{event_name}' when state is '#{state}'"
+      end
   end
 
   # module ActiveRecordInstanceMethods
