@@ -7,7 +7,6 @@ require 'spec/autorun'
 require 'examples/conversation'
 require 'examples/lamp'
 require 'examples/traffic_light'
-require 'examples/user'
 
 Spec::Runner.configure do |config|
   

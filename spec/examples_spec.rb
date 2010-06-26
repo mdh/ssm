@@ -55,29 +55,5 @@ describe "Examples" do
     end
   end
 
-  describe User do
-    it "should work" do
-      user = User.new
-      user.state.should == 'new'
-
-      if user.send_activation_code
-        user.should be_waiting_for_activation
-      else
-        user.log_email_error
-        user.should be_send_activation_code_failed
-      end  
-
-      # # raises error
-      # user.reset_password('foo')
-      # # user.errors['state'].should == 'cannot reset_password if waiting_for_activation'
-      # 
-      # user.confirm_activation_code '123'
-      # user.state.should == :active
-      # 
-      # user.reset_password('foo')
-      # user.state.should == :active
-    end
-  end
-
 end
 

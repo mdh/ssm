@@ -1,33 +1,27 @@
 require 'digest/sha1'
-class User
+class User < ActiveRecord::Base
   
-  attr_accessor :activation_code
+  validates_presence_of :name
+  validates_confirmation_of :activation_code
   
   extend SimpleStateMachine
 
-  def initialize
-    self.state = :new
+  def after_initialize
+    self.state ||= 'new'
   end
 
-  def send_activation_code
+  def invite
     self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
-    if send_activation_email(self.activation_code)
-      self.activation_code
-    else
-      cancel_state_transition
-      self.activation_code = nil
-    end
+    send_activation_email(self.activation_code)
   end
-  event :send_activation_code, :new => :waiting_for_activation
+  event :invite, :new => :invited
     
-  def confirm_activation_code activation_code
-    if self.activation_code != activation_code
-      self.errors[:activation_code] = "Invalid" 
-    end
+  def confirm_invitation activation_code
+    self.activation_code_confirmation = activation_code
   end
-  event :confirm_activation_code, :waiting_for_activation => :active
+  event :confirm_invitation, :invited => :active
 
-  event :log_send_activation_code_failed, :new => :send_activation_code_failed
+  #event :log_send_activation_code_failed, :new => :send_activation_code_failed
 
   def reset_password(new_password)
     self.password = new_password

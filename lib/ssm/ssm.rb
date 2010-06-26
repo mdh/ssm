@@ -47,15 +47,22 @@ module SimpleStateMachine
     end
     
     def transition(event_name)
+      from = @subject.state
       if to = next_state(event_name)
-        result = yield
+        yield
         @subject.state = to
         if event_name.to_s[-1,1] == '!'
-          @subject.send :state_transition_succeeded_callback!
+          begin
+            @subject.send :state_transition_succeeded_callback!
+          rescue ::ActiveRecord::RecordInvalid
+            @subject.state = from
+            raise
+          end
         else
-          @subject.send :state_transition_succeeded_callback
+          result = @subject.send :state_transition_succeeded_callback
+            @subject.state = from unless result
+          result
         end
-        result
       else
         @subject.send :illegal_event_callback, event_name
       end
@@ -159,8 +166,13 @@ module SimpleStateMachine
 
     private
 
-      def state_transition_succeeded_callback; end
-      def state_transition_succeeded_callback!; end
+      def state_transition_succeeded_callback
+        true
+      end
+
+      def state_transition_succeeded_callback!
+        true
+      end
     
       def illegal_event_callback event_name
         # override with your own implementation, like setting errors in your model
