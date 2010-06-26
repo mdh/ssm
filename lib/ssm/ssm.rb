@@ -26,7 +26,6 @@ module SimpleStateMachine
       end
     end
 
-    
   end
   
   class Decorator
@@ -93,6 +92,33 @@ module SimpleStateMachine
       if to
         @next_state = to
         result = yield
+        state = @state = to
+      end
+      result
+    end
+  
+  end
+
+  module ActiveRecordInstanceMethods
+    
+    def set_initial_state(state, state_method='state')
+      self.class.send(:define_method, state_method + '=') do |new_state|
+        @state = new_state.to_s
+      end
+      self.class.send(:define_method, state_method) do
+        @state
+      end
+      send(state_method + '=', state)
+    end
+  
+    def ssm_state
+      @state || self.state
+    end
+  
+    def ssm_transition(event_name, from, to)
+      if to
+        @next_state = to
+        result = yield
         if @__cancel_state_transition
           @__cancel_state_transition = false
         else
@@ -119,5 +145,5 @@ module SimpleStateMachine
     end
   
   end
-  
+
 end

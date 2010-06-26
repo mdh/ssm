@@ -36,16 +36,10 @@ class Account < ActiveRecord::Base
   end
   event :enable,  :pending  => :enabled,
                   :disabled => :enabled
-  def disable; end           
   event :disable, :enabled  => :disabled
-  
-  def send_enabled_email
-  end
-  
-  def state_transition_succeeded_callback(new_state)
-    self.state = new_state
-    save
-  end
+
+  def send_enabled_email; end
+
 end
 
 describe Account do
