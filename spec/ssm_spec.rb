@@ -32,4 +32,12 @@ describe SimpleStateMachine do
 
   end
 
+  describe "state_machine" do
+    it "has a next_state method" do
+      example = SimpleExample.new
+      example.state_machine.next_state('event1').should == 'state2'
+      example.state_machine.next_state('event2').should be_nil
+    end
+  end
+
 end
