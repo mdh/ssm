@@ -26,9 +26,7 @@ class User
     end
   end
   event :confirm_activation_code, :waiting_for_activation => :active
-  
-  def log_send_activation_code_failed
-  end
+
   event :log_send_activation_code_failed, :new => :send_activation_code_failed
 
   def reset_password(new_password)

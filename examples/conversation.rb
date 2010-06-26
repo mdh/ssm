@@ -27,10 +27,7 @@ class Conversation
     set_initial_state(:unread)
   end
 
-  def view; end
-  event :view, :unread => :read
-
-  def close; end
+  event :view,  :unread => :read
   event :close, :unread => :closed,
                 :read   => :closed
 

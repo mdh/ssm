@@ -24,28 +24,37 @@ module SimpleStateMachine
         @events[event_name][from.to_s] = to.to_s
         define_state_helper_method from
         define_state_helper_method to
-        unless @subject.method_defined?("with_managed_state_#{event_name}")
-          decorate_event_method(event_name) 
-        end
+        define_event_method(event_name)
+        decorate_event_method(event_name)
       end
     end
 
     def decorate_event_method event_name
-      @subject.send(:define_method, "with_managed_state_#{event_name}") do |*args|
-        state_machine  = self.class.state_machine
-        state = @state || self.state
-        return ssm_transition(event_name, state, state_machine.events[event_name][state]) do
-          send("without_managed_state_#{event_name}", *args)
+      unless @subject.method_defined?("with_managed_state_#{event_name}")
+        @subject.send(:define_method, "with_managed_state_#{event_name}") do |*args|
+          state_machine  = self.class.state_machine
+          state = @state || self.state
+          return ssm_transition(event_name, state, state_machine.events[event_name][state]) do
+            send("without_managed_state_#{event_name}", *args)
+          end
         end
+        @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
+        @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
       end
-      @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
-      @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
       @subject.send :include, InstanceMethods
+    end
+
+    def define_event_method event_name
+      unless @subject.method_defined?("#{event_name}")
+        @subject.send(:define_method, "#{event_name}") {}
+      end
     end
     
     def define_state_helper_method state
-      @subject.send(:define_method, "#{state.to_s}?") do
-        @state == state.to_s || self.state == state.to_s
+      unless @subject.method_defined?("#{state.to_s}?")
+        @subject.send(:define_method, "#{state.to_s}?") do
+          @state == state.to_s || self.state == state.to_s
+        end
       end
     end
     
