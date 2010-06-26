@@ -27,19 +27,17 @@ This has a couple of advantages:
 
 To use the code, you need to do 3 things:
 - extend SimpleStateMachine,
-- set the initial state in an instance variable named @state,
+- set the initial state,
 - decorate a method with the event DSL
 
 ==== Example usage
 
   class Lamp
 
-    attr_reader :state
-
     extend SimpleStateMachine
 
     def initialize
-      @state = :off
+      self.state = :off
     end
 
     def push_button1
