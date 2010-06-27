@@ -71,15 +71,19 @@ module SimpleStateMachine
 
       def transition(event_name)
         if to = next_state(event_name)
-          errors_added = with_error_counting { yield }
-          if event_name =~ /\!$/
-            raise ::ActiveRecord::RecordInvalid.new(@subject) if errors_added > 0 || @subject.invalid?
-            @subject.state = to
-            @subject.save!
+          if  with_error_counting { yield } > 0 || @subject.invalid?
+            if event_name =~ /\!$/
+              raise ::ActiveRecord::RecordInvalid.new(@subject)
+            else
+              return false
+            end
           else
-            return false if errors_added > 0 || @subject.invalid?
             @subject.state = to
-            @subject.save
+            if event_name =~ /\!$/
+              @subject.save! #TODO maybe save_without_validation!
+            else
+              @subject.save
+            end
           end
         else
           illegal_event_callback event_name
