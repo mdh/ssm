@@ -15,8 +15,7 @@ module SimpleStateMachine
 
     def initialize subject
       @events  = {}
-      @active_record = subject.ancestors.map {|klass| klass.to_s}.include?("ActiveRecord::Base")
-      @decorator = if @active_record
+      @decorator = if inherits_from_active_record_base?(subject)
         Decorator::ActiveRecord.new(subject)
       else
         Decorator::Base.new(subject)
@@ -25,14 +24,14 @@ module SimpleStateMachine
     
     def define_event event_name, state_transitions
       @events[event_name.to_s] ||= {}
-      if @active_record
-        @events["#{event_name}!"] ||= {}
-      end
       state_transitions.each do |from, to|
         @events[event_name.to_s][from.to_s] = to.to_s
-        @events["#{event_name}!"][from.to_s] = to.to_s if @active_record
-        @decorator.decorate(from, to, event_name)
+        @decorator.decorate(event_name, from, to)
       end
+    end
+
+    def inherits_from_active_record_base?(subject)
+      subject.ancestors.map {|klass| klass.to_s}.include?("ActiveRecord::Base")
     end
 
   end
@@ -68,6 +67,13 @@ module SimpleStateMachine
     end
 
     class ActiveRecord < Base
+      
+      def next_state(event_name)
+        if event_name =~ /\!$/
+          event_name = event_name.chop
+        end
+        super event_name
+      end
 
       def transition(event_name)
         if to = next_state(event_name)
@@ -112,7 +118,7 @@ module SimpleStateMachine
         define_state_setter_method
       end
 
-      def decorate from, to, event_name
+      def decorate event_name, from, to
         define_state_helper_method(from)
         define_state_helper_method(to)
         define_event_method(event_name)
@@ -174,8 +180,8 @@ module SimpleStateMachine
     
     class ActiveRecord < Base
 
-      def decorate from, to, event_name
-        super from, to, event_name
+      def decorate event_name, from, to
+        super event_name, from, to
         unless @subject.method_defined?("#{event_name}!")
           @subject.send(:define_method, "#{event_name}!") do |*args|
             send "#{event_name}", *args
