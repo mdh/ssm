@@ -45,12 +45,14 @@ describe User do
       user = User.create!(:name => 'name')
       user.invite.should == true
       User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
     end
 
     it "persists transitions with !" do
       user = User.create!(:name => 'name')
       user.invite!.should == true
       User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
     end
 
     it "raises an error if an invalid state_transition is called" do
@@ -59,10 +61,17 @@ describe User do
       l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
     end
 
-    it "returns falls if event called and record is invalid" do
+    it "returns false if event called and record is invalid" do
       user = User.new
       user.should_not be_valid
       user.invite.should == false
+    end
+
+    it "keeps state if event called and record is invalid" do
+      user = User.new
+      user.should_not be_valid
+      user.invite.should == false
+      user.should be_new
     end
 
     it "raises a RecordInvalid event if called with ! and record is invalid" do
@@ -70,6 +79,15 @@ describe User do
       user.should_not be_valid
       l = lambda { user.invite! }
       l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
+    end
+
+    it "keeps state if event! called and record is invalid" do
+      user = User.new
+      user.should_not be_valid
+      begin
+        user.invite!
+      rescue ActiveRecord::RecordInvalid;end
+      user.should be_new
     end
 
     it "returns falls if record is valid but event adds errors" do
@@ -87,24 +105,23 @@ describe User do
       user.should be_invited
     end
 
-    it "raises a RecordInvalid if record is valid but event adds errors" # do
-     #      user = User.create!(:name => 'name')
-     #      user.invite!
-     #      user.should be_valid
-     #      l = lambda { user.confirm_invitation!('x') }
-     #      l.should raise_error(ActiveRecord::RecordInvalid)#, "Validation failed: Name can't be blank")
-     #    end
+    it "raises a RecordInvalid if record is valid but event adds errors" do
+      user = User.create!(:name => 'name')
+      user.invite!
+      user.should be_valid
+      l = lambda { user.confirm_invitation!('x') }
+      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Activation code Invalid")
+    end
 
-    it "keeps state if record is valid but event adds errors" # do
-     #      user = User.create!(:name => 'name')
-     #      user.invite!
-     #      user.should be_valid
-     #      # begin
-     #        user.confirm_invitation!('x')
-     #      # rescue ActiveRecord::RecordInvalid; end
-     #      debugger
-     #      user.should be_invited
-     #    end
+    it "keeps state if record is valid but event adds errors" do
+      user = User.create!(:name => 'name')
+      user.invite!
+      user.should be_valid
+      begin
+        user.confirm_invitation!('x')
+      rescue ActiveRecord::RecordInvalid;end
+      user.should be_invited
+    end
 
   end
 

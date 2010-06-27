@@ -19,7 +19,7 @@ module SimpleStateMachine
       @decorator = if @active_record
         Decorator::ActiveRecord.new(subject)
       else
-        Decorator::Default.new(subject)
+        Decorator::Base.new(subject)
       end
     end
     
@@ -37,45 +37,75 @@ module SimpleStateMachine
 
   end
   
-  class StateMachine
-    def initialize(subject)
-      @subject = subject
-    end
+  module StateMachine
     
-    def next_state(event_name)
-      @subject.class.state_machine_definition.events[event_name.to_s][@subject.state]
-    end
+    class Base
+      def initialize(subject)
+        @subject = subject
+      end
     
-    def transition(event_name)
-      from = @subject.state
-      if to = next_state(event_name)
-        yield
-        @subject.state = to
-        if event_name.to_s[-1,1] == '!'
-          begin
-            @subject.send :state_transition_succeeded_callback!
-          rescue ::ActiveRecord::RecordInvalid
-            @subject.state = from
-            raise
+      def next_state(event_name)
+        @subject.class.state_machine_definition.events[event_name.to_s][@subject.state]
+      end
+    
+      def transition(event_name)
+        if to = next_state(event_name)
+          result = yield
+          @subject.state = to
+          return result
+        else
+          illegal_event_callback event_name
+        end
+      end
+    
+      private
+
+        def illegal_event_callback event_name
+          # override with your own implementation, like setting errors in your model
+          raise "You cannot '#{event_name}' when state is '#{@subject.state}'"
+        end
+    
+    end
+
+    class ActiveRecord < Base
+
+      def transition(event_name)
+        if to = next_state(event_name)
+          errors_added = with_error_counting { yield }
+          if event_name =~ /\!$/
+            raise ::ActiveRecord::RecordInvalid.new(@subject) if errors_added > 0 || @subject.invalid?
+            @subject.state = to
+            @subject.save!
+          else
+            return false if errors_added > 0 || @subject.invalid?
+            @subject.state = to
+            @subject.save
           end
         else
-          result = @subject.send :state_transition_succeeded_callback
-            @subject.state = from unless result
-          result
+          illegal_event_callback event_name
         end
-      else
-        @subject.send :illegal_event_callback, event_name
       end
+
+      private
+      
+        def with_error_counting
+          original_errors_size =  @subject.errors.size
+          yield
+          @subject.errors.size - original_errors_size          
+        end
+
     end
-    
+
   end
-  
+
   module Decorator
     class Base
 
       def initialize(subject)
         @subject = subject
-        @subject.send :include, InstanceMethods
+        define_state_machine_method
+        define_state_getter_method
+        define_state_setter_method
       end
 
       def decorate from, to, event_name
@@ -84,8 +114,14 @@ module SimpleStateMachine
         define_event_method(event_name)
         decorate_event_method(event_name)
       end
-    
+
       private
+
+        def define_state_machine_method
+          @subject.send(:define_method, "state_machine") do
+            @state_machine ||= StateMachine::Base.new(self)
+          end
+        end
 
         def define_state_helper_method state
           unless @subject.method_defined?("#{state.to_s}?")
@@ -113,18 +149,7 @@ module SimpleStateMachine
             @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
           end
         end
-    
-    end
-  
-    class Default < Base
-      def initialize(subject)
-        super(subject)
-        define_state_getter_method
-        define_state_setter_method
-      end
-    
-      private
-      
+
         def define_state_setter_method
           unless @subject.method_defined?('state=')
             @subject.send(:define_method, 'state=') do |new_state|
@@ -140,58 +165,35 @@ module SimpleStateMachine
             end
           end
         end
-      
+
     end
     
     class ActiveRecord < Base
-      def initialize(subject)
-        super(subject)
-        @subject.send :include, ActiveRecordInstanceMethods
-      end
 
       def decorate from, to, event_name
         super from, to, event_name
-        define_event_method("#{event_name}!")
+        unless @subject.method_defined?("#{event_name}!")
+          @subject.send(:define_method, "#{event_name}!") do |*args|
+            send "#{event_name}", *args
+          end
+        end
         decorate_event_method("#{event_name}!")
       end
+      
+      private
+      
+      def define_state_machine_method
+        @subject.send(:define_method, "state_machine") do
+          @state_machine ||= StateMachine::ActiveRecord.new(self)
+        end
+      end
+
+      def define_state_setter_method; end
+
+      def define_state_getter_method; end
+
     end
     
-  end
-  
-  module InstanceMethods
-    
-    def state_machine
-      @state_machine ||= StateMachine.new(self)
-    end
-
-    private
-
-      def state_transition_succeeded_callback
-        true
-      end
-
-      def state_transition_succeeded_callback!
-        true
-      end
-    
-      def illegal_event_callback event_name
-        # override with your own implementation, like setting errors in your model
-        raise "You cannot '#{event_name}' when state is '#{state}'"
-      end
-  end
-
-  module ActiveRecordInstanceMethods
-
-    private
-
-      def state_transition_succeeded_callback
-        save
-      end
-
-      def state_transition_succeeded_callback!
-        save!
-      end
-  
   end
 
 end

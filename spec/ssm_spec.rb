@@ -9,6 +9,7 @@ class SimpleExample
   event :event1, :state1 => :state2
   def event2
     @event2_called = true
+    'event2'
   end
   event :event2, :state2 => :state3
 end
@@ -27,8 +28,8 @@ describe SimpleStateMachine do
 
     it "return nil" do
       example = SimpleExample.new
-      example.event1.should == true
-      example.event2.should == true
+      example.event1.should == nil
+      example.event2.should == 'event2'
     end
 
     it "calls existing methods" do
