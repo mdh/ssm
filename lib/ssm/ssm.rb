@@ -71,7 +71,7 @@ module SimpleStateMachine
 
       def transition(event_name)
         if to = next_state(event_name)
-          if  with_error_counting { yield } > 0 || @subject.invalid?
+          if with_error_counting { yield } > 0 || @subject.invalid?
             if event_name =~ /\!$/
               raise ::ActiveRecord::RecordInvalid.new(@subject)
             else
@@ -91,11 +91,11 @@ module SimpleStateMachine
       end
 
       private
-      
+
         def with_error_counting
           original_errors_size =  @subject.errors.size
           yield
-          @subject.errors.size - original_errors_size          
+          @subject.errors.size - original_errors_size
         end
 
     end
