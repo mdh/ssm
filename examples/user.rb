@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
     send_activation_email(self.activation_code)
   end
   event :invite, :new => :invited
-    
+
   def confirm_invitation activation_code
     if activation_code != self.activation_code
       errors.add(:activation_code, 'Invalid')

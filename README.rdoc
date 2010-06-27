@@ -14,7 +14,9 @@ state transitions.
 ==== example
 
   def activate_account(activation_code)
-    # logic that checks activation_code here
+    if activation_code_invalid?(activation_code)
+      errors.add(:activation_code, 'Invalid')
+    end
   end
   event :activate_account, :pending => :active
 
@@ -41,15 +43,13 @@ To use the code, you need to do 3 things:
     end
 
     def push_button1
-      puts 'click1'
-      puts @state
+      puts "click1: #{state}"
     end
     event :push_button1, :off => :on,
                          :on  => :off
 
     def push_button2
-      puts 'click2'
-      puts @state
+      puts "click1: #{state}"
     end
     event :push_button2, :off => :on,
                          :on  => :off
