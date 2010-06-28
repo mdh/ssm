@@ -1,6 +1,6 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
-require 'ssm'
+require 'simple_state_machine'
 require 'spec'
 require 'spec/autorun'
 

@@ -14,7 +14,7 @@ module SimpleStateMachine
     attr_reader :events
 
     def initialize subject
-      @events  = {}
+      @events = {}
       @decorator = if inherits_from_active_record_base?(subject)
         Decorator::ActiveRecord.new(subject)
       else
