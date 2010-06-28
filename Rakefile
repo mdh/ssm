@@ -8,7 +8,7 @@ begin
     gem.summary = %Q{TODO: one-line summary of your gem}
     gem.description = %Q{TODO: longer description of your gem}
     gem.email = ["FIX@example.com"]
-    gem.homepage = "http://github.com/p8/ssm"
+    gem.homepage = "http://github.com/p8/simple_state_machine"
     gem.authors = ["Marek de Heus", "Petrik de Heus"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
