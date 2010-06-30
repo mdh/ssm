@@ -32,7 +32,7 @@ To use the code, you need to do 3 things:
 
 ==== Example usage
 
-  class Lamp
+  class LampWithHotelSwitch
 
     attr_reader :state
 
@@ -42,19 +42,19 @@ To use the code, you need to do 3 things:
       @state = :off
     end
 
-    def push_button1
-      puts 'click1'
+    def push_switch_1
+      puts 'pushed switch 1'
       puts @state
     end
-    event :push_button1, :off => :on,
-                         :on  => :off
+    event :push_switch_1, :off => :on,
+                          :on  => :off
 
-    def push_button2
-      puts 'click2'
+    def push_switch_2
+      puts 'pushed switch 2'
       puts @state
     end
-    event :push_button2, :off => :on,
-                         :on  => :off
+    event :push_switch_2, :off => :on,
+                          :on  => :off
 
   end
 
