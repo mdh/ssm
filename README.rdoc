@@ -34,7 +34,7 @@ To use the code, you need to do 3 things:
 
 ==== Example usage
 
-  class Lamp
+  class LampWithHotelSwitch
 
     extend SimpleStateMachine
 
@@ -42,17 +42,17 @@ To use the code, you need to do 3 things:
       self.state = :off
     end
 
-    def push_button1
-      puts "click1: #{state}"
+    def push_switch_1
+      puts 'pushed switch 1 #{state}'
     end
-    event :push_button1, :off => :on,
-                         :on  => :off
+    event :push_switch_1, :off => :on,
+                          :on  => :off
 
-    def push_button2
-      puts "click1: #{state}"
+    def push_switch_2
+      puts 'pushed switch 2 #{state}'
     end
-    event :push_button2, :off => :on,
-                         :on  => :off
+    event :push_switch_2, :off => :on,
+                          :on  => :off
 
   end
 
