@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marek de Heus", "Petrik de Heus"]
   s.date = %q{2010-06-28}
-  s.description = %q{TODO: longer description of your gem}
+  s.description = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
   s.email = ["FIX@example.com"]
   s.extra_rdoc_files = [
     "LICENSE",
@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
      "examples/user.rb",
      "lib/simple_state_machine.rb",
      "lib/simple_state_machine/simple_state_machine.rb",
+     "simple_state_machine.gemspec",
      "spec/active_record_spec.rb",
      "spec/decorator_spec.rb",
      "spec/examples_spec.rb",
@@ -39,7 +40,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{TODO: one-line summary of your gem}
+  s.summary = %q{A statemachine that focuses on events instead of states}
   s.test_files = [
     "spec/active_record_spec.rb",
      "spec/decorator_spec.rb",
