@@ -3,7 +3,7 @@ class User < ActiveRecord::Base
   
   validates_presence_of :name
   
-  extend SimpleStateMachine
+  extend SimpleStateMachine::ActiveRecord
 
   def after_initialize
     self.state ||= 'new'
