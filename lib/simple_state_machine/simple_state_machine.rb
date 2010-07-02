@@ -1,20 +1,16 @@
 module SimpleStateMachine
   
   def event event_name, state_transitions
-    @state_machine_definition ||= StateMachineDefinition.new self
-    @state_machine_definition.define_event event_name, state_transitions
+    state_machine_definition.define_event event_name, state_transitions
   end
   
   def state_machine_definition
-    @state_machine_definition
+    @state_machine_definition ||= StateMachineDefinition.new self
   end
   
   class StateMachineDefinition
-    
-    attr_reader :events
 
     def initialize subject
-      @events = {}
       @decorator = if inherits_from_active_record_base?(subject)
         Decorator::ActiveRecord.new(subject)
       else
@@ -23,15 +19,23 @@ module SimpleStateMachine
     end
     
     def define_event event_name, state_transitions
-      @events[event_name.to_s] ||= {}
       state_transitions.each do |from, to|
-        @events[event_name.to_s][from.to_s] = to.to_s
+        add_transition(event_name, from, to)
         @decorator.decorate(event_name, from, to)
       end
     end
 
     def inherits_from_active_record_base?(subject)
       subject.ancestors.map {|klass| klass.to_s}.include?("ActiveRecord::Base")
+    end
+
+    def transitions
+      @transitions ||= {}
+    end
+    
+    def add_transition event_name, from, to
+      transitions[event_name.to_s] ||= {}
+      transitions[event_name.to_s][from.to_s] = to.to_s
     end
 
   end
@@ -44,7 +48,7 @@ module SimpleStateMachine
       end
     
       def next_state(event_name)
-        @subject.class.state_machine_definition.events[event_name.to_s][@subject.state]
+        transitions[event_name.to_s][@subject.state]
       end
     
       def transition(event_name)
@@ -58,6 +62,10 @@ module SimpleStateMachine
       end
     
       private
+      
+        def transitions
+          @subject.class.state_machine_definition.transitions
+        end
 
         def illegal_event_callback event_name
           # override with your own implementation, like setting errors in your model
@@ -66,49 +74,10 @@ module SimpleStateMachine
     
     end
 
-    class ActiveRecord < Base
-      
-      def next_state(event_name)
-        if event_name =~ /\!$/
-          event_name = event_name.chop
-        end
-        super event_name
-      end
-
-      def transition(event_name)
-        if to = next_state(event_name)
-          if with_error_counting { yield } > 0 || @subject.invalid?
-            if event_name =~ /\!$/
-              raise ::ActiveRecord::RecordInvalid.new(@subject)
-            else
-              return false
-            end
-          else
-            @subject.state = to
-            if event_name =~ /\!$/
-              @subject.save! #TODO maybe save_without_validation!
-            else
-              @subject.save
-            end
-          end
-        else
-          illegal_event_callback event_name
-        end
-      end
-
-      private
-
-        def with_error_counting
-          original_errors_size =  @subject.errors.size
-          yield
-          @subject.errors.size - original_errors_size
-        end
-
-    end
-
   end
 
   module Decorator
+
     class Base
 
       def initialize(subject)
@@ -175,32 +144,6 @@ module SimpleStateMachine
             end
           end
         end
-
-    end
-    
-    class ActiveRecord < Base
-
-      def decorate event_name, from, to
-        super event_name, from, to
-        unless @subject.method_defined?("#{event_name}!")
-          @subject.send(:define_method, "#{event_name}!") do |*args|
-            send "#{event_name}", *args
-          end
-        end
-        decorate_event_method("#{event_name}!")
-      end
-      
-      private
-      
-      def define_state_machine_method
-        @subject.send(:define_method, "state_machine") do
-          @state_machine ||= StateMachine::ActiveRecord.new(self)
-        end
-      end
-
-      def define_state_setter_method; end
-
-      def define_state_getter_method; end
 
     end
     
