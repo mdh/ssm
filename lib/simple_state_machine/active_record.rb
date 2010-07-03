@@ -1,17 +1,9 @@
 module SimpleStateMachine::ActiveRecord
 
-  def event event_name, state_transitions
-    state_machine_definition.define_event event_name, state_transitions
-  end
-
-  def state_machine_definition
-    @state_machine_definition ||= StateMachineDefinition.new self
-  end
-
-  class StateMachineDefinition < SimpleStateMachine::StateMachineDefinition
-    def decorator_class
-      Decorator
-    end
+  include SimpleStateMachine::EventMixin
+  
+  def new_state_machine_definition
+    SimpleStateMachine::StateMachineDefinition.new(self, Decorator)
   end
 
   class StateMachine < SimpleStateMachine::StateMachine
