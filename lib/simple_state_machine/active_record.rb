@@ -2,8 +2,8 @@ module SimpleStateMachine::ActiveRecord
 
   include SimpleStateMachine::EventMixin
   
-  def new_state_machine_definition
-    SimpleStateMachine::StateMachineDefinition.new(self, Decorator)
+  def state_machine_decorator
+    Decorator
   end
 
   class StateMachine < SimpleStateMachine::StateMachine
