@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 require 'rubygems'
-gem 'activerecord', '>= 1.15.4.7794'
+gem 'activerecord', '~> 2.3.5'
 require 'active_record'
 require 'examples/user'
 
