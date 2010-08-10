@@ -22,10 +22,10 @@ state transitions.
 
 
 This has a couple of advantages:
+- Encapsulate state transitions (no need for :guards),
 - Arguments can be passed to 'events',
 - 'events' can return a value, remember, it's just a method,
 - Validation errors can be set on the model if you are using ActiveRecord / ActiveModel,
-- Encapsulate state transitions (no need for :guards).
 
 To use the code, you need to do 3 things:
 - extend SimpleStateMachine,
