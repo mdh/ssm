@@ -26,6 +26,10 @@ module SimpleStateMachine::ActiveRecord
         @subject.send(:define_method, "#{event_name}_and_save!") do |*args|
           old_state = state
           send "#{event_name}", *args
+          if !self.errors.entries.empty?
+            self.state = old_state
+            raise ActiveRecord::RecordInvalid.new(self)
+          end
           begin
             save!
           rescue ActiveRecord::RecordInvalid

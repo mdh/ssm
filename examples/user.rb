@@ -2,7 +2,6 @@ require 'digest/sha1'
 class User < ActiveRecord::Base
   
   validates_presence_of :name
-  validates_confirmation_of :activation_code, :if => lambda{|u| u.active? }
   
   extend SimpleStateMachine::ActiveRecord
 
@@ -17,7 +16,9 @@ class User < ActiveRecord::Base
   event :invite, :new => :invited
 
   def confirm_invitation activation_code
-    self.activation_code_confirmation = activation_code
+    if self.activation_code != activation_code
+      errors.add 'activation_code', 'is invalid'
+    end
   end
   event :confirm_invitation, :invited => :active
 

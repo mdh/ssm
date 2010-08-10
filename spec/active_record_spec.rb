@@ -40,6 +40,8 @@ describe User do
     User.new.should be_new
   end
   
+  # TODO needs nesting/grouping, seems to have some duplication
+ 
   describe "events" do
     it "persists transitions" do
       user = User.create!(:name => 'name')
@@ -90,33 +92,32 @@ describe User do
       user.should be_new
     end
 
-    it "returns falls if record is valid but event adds errors" do
+    it "will inspect errors after event and reset state" do
       user = User.create!(:name => 'name')
       user.invite_and_save!
-      user.should be_valid
-      r = user.confirm_invitation('x').should == false      
-    end
-
-    it "keeps state if record is valid but event adds errors" do
-      user = User.create!(:name => 'name')
-      user.invite_and_save!
-      user.should be_valid
-      user.confirm_invitation_and_save('x')
+      user.should be_invited
+      user.confirm_invitation('x')
+      user.errors.entries.should == [['activation_code', 'is invalid']]
       user.should be_invited
     end
 
-    it "raises a RecordInvalid if record is valid but event adds errors" do
+    it "returns false if event adds errors" do
       user = User.create!(:name => 'name')
       user.invite_and_save!
-      user.should be_valid
+      user.confirm_invitation('x').should == false
+    end
+
+    it "raises a RecordInvalid if 'event'_and_save! is called and event adds errors" do
+      user = User.create!(:name => 'name')
+      user.invite_and_save!
       l = lambda { user.confirm_invitation_and_save!('x') }
-      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Activation code Invalid")
+      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid")
     end
 
     it "keeps state if record is valid but event adds errors" do
       user = User.create!(:name => 'name')
       user.invite_and_save!
-      user.should be_valid
+      user.should be_invited
       begin
         user.confirm_invitation_and_save!('x')
       rescue ActiveRecord::RecordInvalid;end

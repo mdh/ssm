@@ -47,8 +47,17 @@ module SimpleStateMachine
     def transition(event_name)
       if to = next_state(event_name)
         result = yield
-        @subject.state = to
-        return result
+        if defined?(::ActiveRecord) && @subject.is_a?(::ActiveRecord::Base)
+          if @subject.errors.entries.empty?
+            @subject.state = to
+            return true
+          else
+            return false
+          end
+        else
+          @subject.state = to
+          return result
+        end
       else
         illegal_event_callback event_name
       end
