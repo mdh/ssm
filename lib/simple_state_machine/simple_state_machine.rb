@@ -5,7 +5,7 @@ module SimpleStateMachine
     def event event_name, state_transitions
       state_transitions.each do |from, to|
         state_machine_definition.add_transition(event_name, from, to)
-        state_machine_decorator.new(self).decorate(event_name, from, to)
+        state_machine_decorator(self).decorate( event_name, from, to)
       end
     end
 
@@ -13,8 +13,8 @@ module SimpleStateMachine
       @state_machine_definition ||= StateMachineDefinition.new
     end
     
-    def state_machine_decorator
-      Decorator
+    def state_machine_decorator subject
+      Decorator.new subject
     end
 
   end
@@ -47,6 +47,7 @@ module SimpleStateMachine
     def transition(event_name)
       if to = next_state(event_name)
         result = yield
+        # TODO refactor out to AR module
         if defined?(::ActiveRecord) && @subject.is_a?(::ActiveRecord::Base)
           if @subject.errors.entries.empty?
             @subject.state = to
