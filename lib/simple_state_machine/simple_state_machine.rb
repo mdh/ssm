@@ -1,29 +1,27 @@
 module SimpleStateMachine
   
-  def event event_name, state_transitions
-    state_machine_definition.define_event event_name, state_transitions
-  end
-  
-  def state_machine_definition
-    @state_machine_definition ||= StateMachineDefinition.new self
-  end
-  
-  class StateMachineDefinition
+  module EventMixin
 
-    def initialize subject
-      @decorator = decorator_class.new(subject)
-    end
-    
-    def define_event event_name, state_transitions
+    def event event_name, state_transitions
       state_transitions.each do |from, to|
-        add_transition(event_name, from, to)
-        @decorator.decorate(event_name, from, to)
+        state_machine_definition.add_transition(event_name, from, to)
+        state_machine_decorator.new(self).decorate(event_name, from, to)
       end
     end
 
-    def decorator_class
+    def state_machine_definition
+      @state_machine_definition ||= StateMachineDefinition.new
+    end
+    
+    def state_machine_decorator
       Decorator
     end
+
+  end
+
+  include EventMixin
+  
+  class StateMachineDefinition
 
     def transitions
       @transitions ||= {}
