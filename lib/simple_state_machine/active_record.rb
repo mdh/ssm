@@ -2,8 +2,8 @@ module SimpleStateMachine::ActiveRecord
 
   include SimpleStateMachine::EventMixin
   
-  def state_machine_decorator
-    Decorator
+  def state_machine_decorator subject
+    Decorator.new subject
   end
 
   class Decorator < SimpleStateMachine::Decorator
