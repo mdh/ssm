@@ -1,6 +1,7 @@
 module SimpleStateMachine
-  
-  module EventMixin
+  ##
+  # Adds state machine methods to extended class 
+  module StateMachineMixin
 
     def event event_name, state_transitions
       state_transitions.each do |from, to|
@@ -30,8 +31,10 @@ module SimpleStateMachine
     end
   end
 
-  include EventMixin
+  include StateMachineMixin
   
+  ##
+  # Defines state machine transitions
   class StateMachineDefinition
 
     attr_writer :state_method
@@ -51,6 +54,8 @@ module SimpleStateMachine
     end      
   end
   
+  ##
+  # The state machine used by the instance
   class StateMachine
 
     def initialize(subject)
@@ -106,6 +111,8 @@ module SimpleStateMachine
   class Transition < Struct.new(:event_name, :from, :to)
   end
 
+  ##
+  # Decorates the extended class with methods to access the state machine
   class Decorator
 
     def initialize(subject)
