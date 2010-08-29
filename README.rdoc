@@ -34,27 +34,27 @@ To add a state machine:
 - set the initial state
 - turn methods into events
 
-  class LampWithHotelSwitch
-    
-    extend SimpleStateMachine
-    
-    def initialize
-      self.state = :off
+    class LampWithHotelSwitch
+      
+      extend SimpleStateMachine
+      
+      def initialize
+        self.state = :off
+      end
+      
+      def push_switch_1
+        puts 'pushed switch 1 #{state}'
+      end
+      event :push_switch_1, :off => :on,
+                            :on  => :off
+      
+      def push_switch_2
+        puts 'pushed switch 2 #{state}'
+      end
+      event :push_switch_2, :off => :on,
+                            :on  => :off
+      
     end
-    
-    def push_switch_1
-      puts 'pushed switch 1 #{state}'
-    end
-    event :push_switch_1, :off => :on,
-                          :on  => :off
-    
-    def push_switch_2
-      puts 'pushed switch 2 #{state}'
-    end
-    event :push_switch_2, :off => :on,
-                          :on  => :off
-    
-  end
 
 == ActiveRecord Example
 
@@ -63,31 +63,31 @@ To add a state machine with ActiveRecord persistence:
 - set the initial state in after_initialize,
 - turn methods into events
 
-  class User < ActiveRecord::Base
-     
-    extend SimpleStateMachine::ActiveRecord
-    
-    def after_initialize
-      self.state ||= 'new'
-      # if you get an ActiveRecord::MissingAttributeError
-      # you'll probably need to do (http://bit.ly/35q23b):
-      #   write_attribute(:state, "new") unless read_attribute(:state)
-    end
-    
-    def invite
-      self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
-      #send_activation_email
-    end
-    event :invite, :new => :invited
-    
-    def confirm_invitation activation_code
-      if self.activation_code != activation_code
-        errors.add 'activation_code', 'is invalid'
+    class User < ActiveRecord::Base
+       
+      extend SimpleStateMachine::ActiveRecord
+      
+      def after_initialize
+        self.state ||= 'new'
+        # if you get an ActiveRecord::MissingAttributeError
+        # you'll probably need to do (http://bit.ly/35q23b):
+        #   write_attribute(:state, "new") unless read_attribute(:state)
       end
+      
+      def invite
+        self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
+        #send_activation_email
+      end
+      event :invite, :new => :invited
+      
+      def confirm_invitation activation_code
+        if self.activation_code != activation_code
+          errors.add 'activation_code', 'is invalid'
+        end
+      end
+      event :confirm_invitation, :invited => :active
+      
     end
-    event :confirm_invitation, :invited => :active
-    
-  end
 
 This generates the following methods
 - {event}_and_save  works like save
