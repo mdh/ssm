@@ -1,14 +1,11 @@
 = SimpleStateMachine
 
-A Ruby Statemachine that focuses on events instead of states.
+A simple DSL to decorate existing methods with state transition guards.
 
-A state machine should help you:
-- Encapsulate state,
-- Guard state transitions,
-- Make it trivial to add state transitions to any method.
+SimpleStateMachine helps you to encapsulate state and guard state transitions.
+Adding state transitions to a method is trivial.
 
-Instead of using a DSL to define events, we use a different approach.
-We have a simple DSL to decorate existing methods with logic that guards 
+Instead of using a DSL to define events, SimpleStateMachine decorates existing methods with logic that guards 
 state transitions.
 
 ==== example
@@ -21,11 +18,11 @@ state transitions.
   event :activate_account, :pending => :active
 
 
-This has a couple of advantages:
-- Encapsulate state transitions (no need for :guards),
-- Arguments can be passed to 'events',
-- 'events' can return a value it's just a method,
-- Validation errors can be set on the model if you are using ActiveRecord / ActiveModel,
+Decorating methods has a couple of advantages:
+- No need for defining extra methods for adding logic
+- Arguments can be passed to events
+- State transitions are encapsulated. No need for :guards
+- Validation errors can be set on the model if you are using ActiveRecord / ActiveModel
 
 == Example
 
