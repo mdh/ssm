@@ -8,7 +8,7 @@ A state machine should help you:
 - Make it trivial to add state transitions to any method.
 
 Instead of using a DSL to define events, we use a different approach.
-We have a very simple DSL to decorate existing methods with logic that guards 
+We have a simple DSL to decorate existing methods with logic that guards 
 state transitions.
 
 ==== example
@@ -24,15 +24,15 @@ state transitions.
 This has a couple of advantages:
 - Encapsulate state transitions (no need for :guards),
 - Arguments can be passed to 'events',
-- 'events' can return a value, remember, it's just a method,
+- 'events' can return a value it's just a method,
 - Validation errors can be set on the model if you are using ActiveRecord / ActiveModel,
 
-To use the code, you need to do 3 things:
+== Example
+
+To use the code:
 - extend SimpleStateMachine,
 - set the initial state,
 - decorate a method with the event DSL
-
-==== Example usage
 
   class LampWithHotelSwitch
 
@@ -55,6 +55,46 @@ To use the code, you need to do 3 things:
                           :on  => :off
 
   end
+
+== ActiveRecord Example
+
+To add a state machine with ActiveRecord persistence:
+- extend SimpleStateMachine::ActiveRecord,
+- set the initial state in after_initialize,
+- decorate a method with the event DSL
+
+  class User < ActiveRecord::Base
+    
+    extend SimpleStateMachine::ActiveRecord
+    
+    def after_initialize
+      self.state ||= 'new'
+      # if you get an ActiveRecord::MissingAttributeError
+      # you'll probably need to do (http://bit.ly/35q23b):
+      #   write_attribute(:state, "new") unless read_attribute(:state)
+    end
+    
+    def invite
+      self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
+      #send_activation_email
+    end
+    event :invite, :new => :invited
+    
+    def confirm_invitation activation_code
+      if self.activation_code != activation_code
+        errors.add 'activation_code', 'is invalid'
+      end
+    end
+    event :confirm_invitation, :invited => :active
+
+  end
+
+This generates the following methods
+- {event}_and_save  works like save
+- {event}_and_save! works like save!
+- {event}!          works the same as {event}_and_save! 
+- {state}?          whether or not the current state is {state}
+
 
 This code was just released, we do not claim it to be stable.
 
