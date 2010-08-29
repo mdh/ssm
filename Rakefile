@@ -8,7 +8,7 @@ begin
     gem.summary = %Q{A statemachine that focuses on events instead of states}
     gem.description = %Q{A simple DSL to decorate existing methods with logic that guards state transitions.}
     gem.email = ["FIX@example.com"]
-    gem.homepage = "http://github.com/p8/simple_state_machine"
+    gem.homepage = "http://github.com/mdh/ssm"
     gem.authors = ["Marek de Heus", "Petrik de Heus"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
