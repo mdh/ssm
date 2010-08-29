@@ -50,6 +50,13 @@ describe User do
       User.find(user.id).activation_code.should_not be_nil
     end
 
+    it "persists transitions when using send and a symbol" do
+      user = User.create!(:name => 'name')
+      user.send(:invite_and_save).should == true
+      User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
+    end
+
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
       l = lambda { user.confirm_invitation_and_save 'abc' }

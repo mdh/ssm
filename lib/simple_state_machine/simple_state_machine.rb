@@ -41,7 +41,7 @@ module SimpleStateMachine
     end
   
     def next_state(event_name)
-      transitions[event_name.to_s][@subject.state]
+      transitions[event_name.to_s][@subject.state.to_s]
     end
   
     def transition(event_name)

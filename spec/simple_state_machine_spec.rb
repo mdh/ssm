@@ -3,10 +3,10 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 class SimpleExample
   extend SimpleStateMachine
   attr_reader :event2_called
-  def initialize
-    self.state = 'state1'
+  def initialize(state = 'state1')
+    @state = state
   end
-  event :event1, :state1 => :state2
+  event :event1, :state1 => :state2, :state2 => :state3
   def event2
     @event2_called = true
     'event2'
@@ -21,6 +21,23 @@ describe SimpleStateMachine do
   end
 
   describe "events" do
+
+    it "changes state" do
+      example = SimpleExample.new
+      example.should be_state1
+      example.event1
+      example.should be_state2
+      example.event1
+      example.should be_state3
+    end
+
+    it "changes state when state is a symbol instead of a string" do
+      example = SimpleExample.new :state1
+      example.state.should == :state1
+      example.send(:event1)
+      example.should be_state2
+    end
+
     it "raise an error if an invalid state_transition is called" do
       example = SimpleExample.new
       lambda { example.event2 }.should raise_error(RuntimeError, "You cannot 'event2' when state is 'state1'")
