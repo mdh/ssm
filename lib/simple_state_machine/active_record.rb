@@ -42,6 +42,7 @@ module SimpleStateMachine::ActiveRecord
             raise
           end
         end
+        @subject.send :alias_method, "#{transition.event_name}!", "#{transition.event_name}_and_save!"
       end
     end
   

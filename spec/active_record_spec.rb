@@ -42,7 +42,7 @@ describe User do
   
   # TODO needs nesting/grouping, seems to have some duplication
  
-  describe "and_save" do
+  describe "event_and_save" do
     it "persists transitions" do
       user = User.create!(:name => 'name')
       user.invite_and_save.should == true
@@ -82,7 +82,7 @@ describe User do
 
   end
 
-  describe "and_save!" do
+  describe "event_and_save!" do
 
     it "persists transitions" do
       user = User.create!(:name => 'name')
@@ -117,4 +117,23 @@ describe User do
 
   end
 
+  describe "event!" do
+
+    it "persists transitions" do
+      user = User.create!(:name => 'name')
+      user.invite!.should == true
+      User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
+    end
+
+    it "raises a RecordInvalid and keeps state if record is invalid" do
+      user = User.new
+      user.should be_new
+      user.should_not be_valid
+      l = lambda { user.invite! }
+      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
+      user.should be_new
+    end
+
+  end
 end
