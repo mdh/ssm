@@ -5,16 +5,17 @@
 
 Gem::Specification.new do |s|
   s.name = %q{simple_state_machine}
-  s.version = "0.1.0"
+  s.version = "0.2.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Marek de Heus", "Petrik de Heus"]
-  s.date = %q{2010-08-12}
+  s.date = %q{2010-08-29}
   s.description = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
   s.email = ["FIX@example.com"]
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.rdoc"
+     "README.rdoc",
+     "TODO"
   ]
   s.files = [
     "LICENSE",
