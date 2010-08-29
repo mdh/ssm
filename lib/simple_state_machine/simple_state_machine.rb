@@ -4,19 +4,30 @@ module SimpleStateMachine
 
     def event event_name, state_transitions
       state_transitions.each do |from, to|
-        state_machine_definition.add_transition(event_name, from, to)
-        state_machine_decorator(self).decorate( event_name, from, to)
+        transition = state_machine_definition.add_transition(event_name, from, to)
+        state_machine_decorator(self).decorate(transition)
       end
     end
 
     def state_machine_definition
       @state_machine_definition ||= StateMachineDefinition.new
     end
+
+    def state_machine_definition= state_machine_definition
+      @state_machine_definition = state_machine_definition
+      state_machine_definition.transitions.each do |transition|
+        state_machine_decorator(self).decorate(transition)
+      end
+    end
     
     def state_machine_decorator subject
       Decorator.new subject
     end
 
+    def inherited(subclass)
+      subclass.state_machine_definition = state_machine_definition.clone
+      super
+    end
   end
 
   include EventMixin
@@ -24,12 +35,13 @@ module SimpleStateMachine
   class StateMachineDefinition
 
     def transitions
-      @transitions ||= {}
+      @transitions ||= []
     end
     
     def add_transition event_name, from, to
-      transitions[event_name.to_s] ||= {}
-      transitions[event_name.to_s][from.to_s] = to.to_s
+      transition = Transition.new(event_name.to_s, from.to_s, to.to_s)
+      transitions << transition
+      transition
     end
 
   end
@@ -41,7 +53,8 @@ module SimpleStateMachine
     end
   
     def next_state(event_name)
-      transitions[event_name.to_s][@subject.state.to_s]
+      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.state.to_s == t.from.to_s}.first
+      transition ? transition.to : nil
     end
   
     def transition(event_name)
@@ -77,6 +90,9 @@ module SimpleStateMachine
   
   end
 
+  class Transition < Struct.new(:event_name, :from, :to)
+  end
+
   class Decorator
 
     def initialize(subject)
@@ -86,11 +102,11 @@ module SimpleStateMachine
       define_state_setter_method
     end
 
-    def decorate event_name, from, to
-      define_state_helper_method(from)
-      define_state_helper_method(to)
-      define_event_method(event_name)
-      decorate_event_method(event_name)
+    def decorate transition
+      define_state_helper_method(transition.from)
+      define_state_helper_method(transition.to)
+      define_event_method(transition.event_name)
+      decorate_event_method(transition.event_name)
     end
 
     private

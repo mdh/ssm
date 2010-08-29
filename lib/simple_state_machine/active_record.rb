@@ -8,12 +8,12 @@ module SimpleStateMachine::ActiveRecord
 
   class Decorator < SimpleStateMachine::Decorator
 
-    def decorate event_name, from, to
-      super event_name, from, to
-      unless @subject.method_defined?("#{event_name}_and_save")
-        @subject.send(:define_method, "#{event_name}_and_save") do |*args|
+    def decorate transition
+      super transition
+      unless @subject.method_defined?("#{transition.event_name}_and_save")
+        @subject.send(:define_method, "#{transition.event_name}_and_save") do |*args|
           old_state = state
-          send "#{event_name}", *args
+          send "#{transition.event_name}", *args
           if !self.errors.entries.empty?
             self.state = old_state
             return false
@@ -27,10 +27,10 @@ module SimpleStateMachine::ActiveRecord
           end
         end
       end
-      unless @subject.method_defined?("#{event_name}_and_save!")
-        @subject.send(:define_method, "#{event_name}_and_save!") do |*args|
+      unless @subject.method_defined?("#{transition.event_name}_and_save!")
+        @subject.send(:define_method, "#{transition.event_name}_and_save!") do |*args|
           old_state = state
-          send "#{event_name}", *args
+          send "#{transition.event_name}", *args
           if !self.errors.entries.empty?
             self.state = old_state
             raise ActiveRecord::RecordInvalid.new(self)

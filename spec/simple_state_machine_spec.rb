@@ -58,6 +58,17 @@ describe SimpleStateMachine do
 
   end
 
+  describe "state_machine_definition" do
+    it "is inherited by subclasses" do
+      example = Class.new(SimpleExample).new
+      example.should be_state1
+      example.event1
+      example.should be_state2
+      example.event1
+      example.should be_state3
+    end
+  end
+
   describe "state_machine" do
     it "has a next_state method" do
       example = SimpleExample.new
