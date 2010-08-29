@@ -2,10 +2,7 @@
 
 A simple DSL to decorate existing methods with state transition guards.
 
-SimpleStateMachine helps you to encapsulate state and guard state transitions.
-
-Instead of using a DSL to define events, SimpleStateMachine decorates existing methods with logic that guards 
-state transitions.
+Instead of using a DSL to define events, SimpleStateMachine decorates methods to help you encapsulate state and guard state transitions.
 
 ==== example
 
