@@ -29,31 +29,31 @@ This has a couple of advantages:
 
 == Example
 
-To use the code:
-- extend SimpleStateMachine,
-- set the initial state,
-- decorate a method with the event DSL
+To add a state machine:
+- extend SimpleStateMachine
+- set the initial state
+- turn methods into events
 
   class LampWithHotelSwitch
-
+    
     extend SimpleStateMachine
-
+    
     def initialize
       self.state = :off
     end
-
+    
     def push_switch_1
       puts 'pushed switch 1 #{state}'
     end
     event :push_switch_1, :off => :on,
                           :on  => :off
-
+    
     def push_switch_2
       puts 'pushed switch 2 #{state}'
     end
     event :push_switch_2, :off => :on,
                           :on  => :off
-
+    
   end
 
 == ActiveRecord Example
@@ -61,10 +61,10 @@ To use the code:
 To add a state machine with ActiveRecord persistence:
 - extend SimpleStateMachine::ActiveRecord,
 - set the initial state in after_initialize,
-- decorate a method with the event DSL
+- turn methods into events
 
   class User < ActiveRecord::Base
-    
+     
     extend SimpleStateMachine::ActiveRecord
     
     def after_initialize
@@ -86,7 +86,7 @@ To add a state machine with ActiveRecord persistence:
       end
     end
     event :confirm_invitation, :invited => :active
-
+    
   end
 
 This generates the following methods
