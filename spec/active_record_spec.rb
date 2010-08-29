@@ -18,6 +18,12 @@ def setup_db
       t.column :updated_at, :datetime
     end
   end
+  ActiveRecord::Schema.define(:version => 1) do    
+    create_table :tickets do |t|
+      t.column :id, :integer
+      t.column :ssm_state, :string
+    end
+  end
 end
 
 def teardown_db
@@ -26,7 +32,19 @@ def teardown_db
   end
 end
 
-describe User do
+class Ticket < ActiveRecord::Base
+  extend SimpleStateMachine::ActiveRecord
+
+  state_machine_definition.state_method = :ssm_state
+ 
+  def after_initialize
+    self.ssm_state ||= 'open'
+  end
+
+  event :close, :open => :closed
+end
+
+describe ActiveRecord do
   
   before do
     setup_db
@@ -133,6 +151,24 @@ describe User do
       l = lambda { user.invite! }
       l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
       user.should be_new
+    end
+
+  end
+
+  describe 'custom state method' do
+    
+    it "persists transitions" do
+      ticket = Ticket.create!
+      ticket.should be_open
+      ticket.close.should == true
+      ticket.should be_closed
+    end
+
+    it "persists transitions with !" do
+      ticket = Ticket.create!
+      ticket.should be_open
+      ticket.close!
+      ticket.should be_closed
     end
 
   end

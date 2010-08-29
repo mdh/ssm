@@ -34,6 +34,8 @@ module SimpleStateMachine
   
   class StateMachineDefinition
 
+    attr_writer :state_method
+
     def transitions
       @transitions ||= []
     end
@@ -43,7 +45,10 @@ module SimpleStateMachine
       transitions << transition
       transition
     end
-
+    
+    def state_method
+      @state_method ||= :state
+    end      
   end
   
   class StateMachine
@@ -53,7 +58,7 @@ module SimpleStateMachine
     end
   
     def next_state(event_name)
-      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.state.to_s == t.from.to_s}.first
+      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.send(state_method).to_s == t.from.to_s}.first
       transition ? transition.to : nil
     end
   
@@ -63,13 +68,13 @@ module SimpleStateMachine
         # TODO refactor out to AR module
         if defined?(::ActiveRecord) && @subject.is_a?(::ActiveRecord::Base)
           if @subject.errors.entries.empty?
-            @subject.state = to
+            @subject.send("#{state_method}=", to)
             return true
           else
             return false
           end
         else
-          @subject.state = to
+          @subject.send("#{state_method}=", to)
           return result
         end
       else
@@ -78,9 +83,17 @@ module SimpleStateMachine
     end
   
     private
-    
+      
+      def state_machine_definition
+        @subject.class.state_machine_definition
+      end
+
       def transitions
-        @subject.class.state_machine_definition.transitions
+        state_machine_definition.transitions
+      end
+
+      def state_method
+        state_machine_definition.state_method
       end
 
       def illegal_event_callback event_name
@@ -120,7 +133,7 @@ module SimpleStateMachine
       def define_state_helper_method state
         unless @subject.method_defined?("#{state.to_s}?")
           @subject.send(:define_method, "#{state.to_s}?") do
-            self.state == state.to_s
+            self.send(self.class.state_machine_definition.state_method) == state.to_s
           end
         end
       end
@@ -145,21 +158,24 @@ module SimpleStateMachine
       end
 
       def define_state_setter_method
-        unless @subject.method_defined?('state=')
-          @subject.send(:define_method, 'state=') do |new_state|
-            @state = new_state.to_s
+        unless @subject.method_defined?("#{state_method}=")
+          @subject.send(:define_method, "#{state_method}=") do |new_state|
+            instance_variable_set(:"@#{self.class.state_machine_definition.state_method}", new_state)
           end
         end
       end
 
       def define_state_getter_method
-        unless @subject.method_defined?('state')
-          @subject.send(:define_method, 'state') do
-            @state
-          end
+        unless @subject.method_defined?(state_method)
+          @subject.send(:attr_reader, state_method)
         end
       end
 
+    protected
+
+      def state_method
+        @subject.state_machine_definition.state_method
+      end
   end
 
 end
