@@ -14,11 +14,16 @@ module SimpleStateMachine::ActiveRecord
         @subject.send(:define_method, "#{event_name}_and_save") do |*args|
           old_state = state
           send "#{event_name}", *args
-          if save
-            return true
-          else
+          if !self.errors.entries.empty?
             self.state = old_state
             return false
+          else
+            if save
+              return true
+            else
+              self.state = old_state
+              return false
+            end
           end
         end
       end

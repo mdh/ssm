@@ -42,17 +42,10 @@ describe User do
   
   # TODO needs nesting/grouping, seems to have some duplication
  
-  describe "events" do
+  describe "and_save" do
     it "persists transitions" do
       user = User.create!(:name => 'name')
       user.invite_and_save.should == true
-      User.find(user.id).should be_invited
-      User.find(user.id).activation_code.should_not be_nil
-    end
-
-    it "persists transitions with !" do
-      user = User.create!(:name => 'name')
-      user.invite_and_save!.should == true
       User.find(user.id).should be_invited
       User.find(user.id).activation_code.should_not be_nil
     end
@@ -63,64 +56,56 @@ describe User do
       l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
     end
 
-    it "returns false if event called and record is invalid" do
+    it "returns false and keeps state if record is invalid" do
       user = User.new
-      user.should_not be_valid
-      user.invite_and_save.should == false
-    end
-
-    it "keeps state if event called and record is invalid" do
-      user = User.new
+      user.should be_new
       user.should_not be_valid
       user.invite_and_save.should == false
       user.should be_new
     end
 
-    it "raises a RecordInvalid event if called with ! and record is invalid" do
+    it "returns false, keeps state and keeps errors if event adds errors" do
+      user = User.create!(:name => 'name')
+      user.invite_and_save!
+      user.should be_invited
+      user.confirm_invitation_and_save('x').should == false
+      user.should be_invited
+      user.errors.entries.should == [['activation_code', 'is invalid']]
+    end
+
+  end
+
+  describe "and_save!" do
+
+    it "persists transitions" do
+      user = User.create!(:name => 'name')
+      user.invite_and_save!.should == true
+      User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
+    end
+
+    it "raises an error if an invalid state_transition is called" do
+      user = User.create!(:name => 'name')
+      l = lambda { user.confirm_invitation_and_save! 'abc' }
+      l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
+    end
+
+
+    it "raises a RecordInvalid and keeps state if record is invalid" do
       user = User.new
+      user.should be_new
       user.should_not be_valid
       l = lambda { user.invite_and_save! }
       l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
-    end
-
-    it "keeps state if event! called and record is invalid" do
-      user = User.new
-      user.should_not be_valid
-      begin
-        user.invite_and_save!
-      rescue ActiveRecord::RecordInvalid;end
       user.should be_new
     end
 
-    it "will inspect errors after event and reset state" do
+    it "raises a RecordInvalid and keeps state if event adds errors" do
       user = User.create!(:name => 'name')
       user.invite_and_save!
       user.should be_invited
-      user.confirm_invitation('x')
-      user.errors.entries.should == [['activation_code', 'is invalid']]
-      user.should be_invited
-    end
-
-    it "returns false if event adds errors" do
-      user = User.create!(:name => 'name')
-      user.invite_and_save!
-      user.confirm_invitation('x').should == false
-    end
-
-    it "raises a RecordInvalid if 'event'_and_save! is called and event adds errors" do
-      user = User.create!(:name => 'name')
-      user.invite_and_save!
       l = lambda { user.confirm_invitation_and_save!('x') }
       l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid")
-    end
-
-    it "keeps state if record is valid but event adds errors" do
-      user = User.create!(:name => 'name')
-      user.invite_and_save!
-      user.should be_invited
-      begin
-        user.confirm_invitation_and_save!('x')
-      rescue ActiveRecord::RecordInvalid;end
       user.should be_invited
     end
 
