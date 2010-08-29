@@ -3,7 +3,6 @@
 A simple DSL to decorate existing methods with state transition guards.
 
 SimpleStateMachine helps you to encapsulate state and guard state transitions.
-Adding state transitions to a method is trivial.
 
 Instead of using a DSL to define events, SimpleStateMachine decorates existing methods with logic that guards 
 state transitions.
