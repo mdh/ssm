@@ -18,9 +18,8 @@ state transitions.
 
 
 Decorating methods has a couple of advantages:
-- No need for defining extra methods for adding logic
+- No need for defining callbacks or other methods to add logic
 - Arguments can be passed to events
-- State transitions are encapsulated. No need for :guards
 - Validation errors can be set on the model if you are using ActiveRecord / ActiveModel
 
 == Example
