@@ -90,7 +90,6 @@ describe User do
       l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
     end
 
-
     it "raises a RecordInvalid and keeps state if record is invalid" do
       user = User.new
       user.should be_new
