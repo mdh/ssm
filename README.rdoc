@@ -6,17 +6,16 @@ Instead of using a DSL to define events, SimpleStateMachine decorates methods to
 
 ==== example
 
-  # define the event with a simple method
-  # arguments are allowed
+  # define the event with a simple method, arguments are allowed
   def activate_account(activation_code)
     if activation_code_invalid?(activation_code)
-      # add validation errors if using ActiveRecord / ActiveModel
+      # add validation errors if using ActiveRecord / ActddiveModel
       errors.add(:activation_code, 'Invalid')
     end
     # do some more stuff like sending mails, no need to add these in callbacks
   end
   # turn the method into an event
-  # the event can only transition from :pending to :active
+  # this event can only transition from :pending to :active
   event :activate_account, :pending => :active
 
 
@@ -41,9 +40,7 @@ To add a state machine:
       event :push_switch_1, :off => :on,
                             :on  => :off
       
-      def push_switch_2
-        puts 'pushed switch 2 #{state}'
-      end
+      # defining a event method is optional
       event :push_switch_2, :off => :on,
                             :on  => :off
       
