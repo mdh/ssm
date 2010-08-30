@@ -6,14 +6,13 @@ Instead of using a DSL to define events, SimpleStateMachine decorates methods to
 
 ==== example
 
-  # define the event with a simple method, arguments are allowed
+  # Define the event with a simple method, arguments are allowed
   def activate_account(activation_code)
-    if activation_code_invalid?(activation_code)
-      # add validation errors if using ActiveRecord / ActddiveModel
-      errors.add(:activation_code, 'Invalid')
-    end
-    # do some more stuff like sending mails, no need to add these in callbacks
+    # do some stuff like sending mails, no need to add these in callbacks
+    # or add validation errors if using ActiveRecord / ActddiveModel
+    errors.add(:activation_code, 'Invalid') if activation_code_invalid?(activation_code)
   end
+
   # turn the method into an event
   # this event can only transition from :pending to :active
   event :activate_account, :pending => :active
