@@ -4,7 +4,7 @@ A simple DSL to decorate existing methods with state transition guards.
 
 Instead of using a DSL to define events, SimpleStateMachine decorates methods to help you encapsulate state and guard state transitions.
 
-==== example
+==== Example method
 
   # Define the event with a simple method, arguments are allowed
   def activate_account(activation_code)
@@ -19,7 +19,7 @@ Instead of using a DSL to define events, SimpleStateMachine decorates methods to
   event :activate_account, :pending => :active
 
 
-== Example
+== Example implementation
 
 To add a state machine:
 - extend SimpleStateMachine
