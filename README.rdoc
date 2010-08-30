@@ -8,13 +8,14 @@ Instead of using a DSL to define events, SimpleStateMachine decorates methods to
 
   # Define the event with a simple method, arguments are allowed
   def activate_account(activation_code)
-    # do some stuff like sending mails, no need to add these in callbacks
-    # or add validation errors if using ActiveRecord / ActddiveModel
+    # Call other methods, no need to add these in callbacks
+    log.debug "Try to activate account with #{activation_code}"
+    # Or add validation errors if using ActiveRecord / ActiveModel
     errors.add(:activation_code, 'Invalid') if activation_code_invalid?(activation_code)
   end
 
-  # turn the method into an event
-  # this event can only transition from :pending to :active
+  # Turn the method into an event
+  # This event can only transition from :pending to :active
   event :activate_account, :pending => :active
 
 
