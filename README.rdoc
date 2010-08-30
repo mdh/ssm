@@ -6,18 +6,19 @@ Instead of using a DSL to define events, SimpleStateMachine decorates methods to
 
 ==== example
 
+  # define the event with a simple method
+  # arguments are allowed
   def activate_account(activation_code)
     if activation_code_invalid?(activation_code)
+      # add validation errors if using ActiveRecord / ActiveModel
       errors.add(:activation_code, 'Invalid')
     end
+    # do some more stuff like sending mails, no need to add these in callbacks
   end
+  # turn the method into an event
+  # the event can only transition from :pending to :active
   event :activate_account, :pending => :active
 
-
-Decorating methods has a couple of advantages:
-- No need for defining callbacks or other methods to add logic
-- Arguments can be passed to events
-- Validation errors can be set on the model if you are using ActiveRecord / ActiveModel
 
 == Example
 
