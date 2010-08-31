@@ -15,7 +15,11 @@ class SimpleExample
 end
 
 describe SimpleStateMachine do
-  
+ 
+  it "has an error that extends RuntimeError" do
+    SimpleStateMachine::Error.superclass.should == RuntimeError
+  end
+
   it "has a default state" do
     SimpleExample.new.state.should == 'state1'
   end
@@ -40,7 +44,7 @@ describe SimpleStateMachine do
 
     it "raise an error if an invalid state_transition is called" do
       example = SimpleExample.new
-      lambda { example.event2 }.should raise_error(RuntimeError, "You cannot 'event2' when state is 'state1'")
+      lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
     end
 
     it "return nil" do
