@@ -24,7 +24,7 @@ set the state to :active if the initial state is :pending.
 
 That's it! 
 You can now call the method and the state will automatically change.
-If the state change is not allowed, an error is raised.
+If the state change is not allowed, a SimpleStateMachine::Error is raised.
 
 === Example usage with ActiveRecord / ActiveModel
 When using ActiveRecord / ActiveModel you can add an error to the errors object.
