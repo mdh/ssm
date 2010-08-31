@@ -2,24 +2,40 @@
 
 A simple DSL to decorate existing methods with state transition guards.
 
-Instead of using a DSL to define events, SimpleStateMachine decorates methods to help you encapsulate state and guard state transitions.
+Instead of using a DSL to define events, SimpleStateMachine decorates methods 
+to help you encapsulate state and guard state transitions.
 
-==== Example method
+== Example usage
 
-  # Define the event with a simple method, arguments are allowed
+Write a method, arguments are allowed:
+
   def activate_account(activation_code)
-    # Call other methods, no need to add these in callbacks
+    # call other methods, no need to add these in callbacks
+    ...
     log.debug "Try to activate account with #{activation_code}"
-    # Or add validation errors if using ActiveRecord / ActiveModel
-    errors.add(:activation_code, 'Invalid') if activation_code_invalid?(activation_code)
   end
 
-  # Turn the method into an event
-  # This event can only transition from :pending to :active
+Now mark the method as an event (this event can only transition from 
+:pending state to :active state):
+
   event :activate_account, :pending => :active
 
+That's it! 
+You can now call the method and the state will automatically change.
+If the state change is not allowed, an error is raised.
 
-== Example implementation
+=== Example usage with ActiveRecord / ActiveModel
+When using ActiveRecord / ActiveModel you can add an error to the errors object.
+This will prevent the state from being changed.
+  
+  def activate_account(activation_code)
+    if activation_code_invalid?(activation_code)
+      errors.add(:activation_code, 'Invalid')
+    end
+  end
+
+
+== More complete implementation
 
 To add a state machine:
 - extend SimpleStateMachine
@@ -40,7 +56,8 @@ To add a state machine:
       event :push_switch_1, :off => :on,
                             :on  => :off
       
-      # defining a event method is optional
+      # define another event
+      # note that implementation of :push_switch_2 is optional
       event :push_switch_2, :off => :on,
                             :on  => :off
       
