@@ -27,12 +27,12 @@ end
 describe SimpleStateMachine::Decorator do
 
   it "defines state_helper_methods for all states" do
-    TrafficLight.new.green?.should == true
+    TrafficLight.new.green?.should  == true
     TrafficLight.new.orange?.should == false
-    TrafficLight.new.red?.should == false
+    TrafficLight.new.red?.should    == false
   end
   
-  it "does not define an state_helper_method if it already exists" do
+  it "does not define a state_helper_method if it already exists" do
     l = lambda { WithPredefinedStateHelperMethods.new.unread? }
     l.should raise_error(RuntimeError, 'blah')
   end

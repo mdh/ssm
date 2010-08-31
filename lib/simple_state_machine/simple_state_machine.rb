@@ -1,4 +1,8 @@
 module SimpleStateMachine
+  
+  class Error < ::RuntimeError
+  end
+
   ##
   # Adds state machine methods to extended class 
   module StateMachineMixin
@@ -103,7 +107,7 @@ module SimpleStateMachine
 
       def illegal_event_callback event_name
         # override with your own implementation, like setting errors in your model
-        raise "You cannot '#{event_name}' when state is '#{@subject.state}'"
+        raise Error.new("You cannot '#{event_name}' when state is '#{@subject.state}'")
       end
   
   end

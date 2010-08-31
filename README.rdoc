@@ -15,7 +15,7 @@ Write a method, arguments are allowed:
     log.debug "Try to activate account with #{activation_code}"
   end
 
-Now mark the method as an event (this event can only transition from 
+Now mark the method as an event (in this examplet we can only transition from 
 :pending state to :active state):
 
   event :activate_account, :pending => :active

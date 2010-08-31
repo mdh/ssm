@@ -78,7 +78,7 @@ describe ActiveRecord do
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
       l = lambda { user.confirm_invitation_and_save 'abc' }
-      l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
+      l.should raise_error(SimpleStateMachine::Error, "You cannot 'confirm_invitation' when state is 'new'")
     end
 
     it "returns false and keeps state if record is invalid" do
@@ -112,7 +112,7 @@ describe ActiveRecord do
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
       l = lambda { user.confirm_invitation_and_save! 'abc' }
-      l.should raise_error(RuntimeError, "You cannot 'confirm_invitation' when state is 'new'")
+      l.should raise_error(SimpleStateMachine::Error, "You cannot 'confirm_invitation' when state is 'new'")
     end
 
     it "raises a RecordInvalid and keeps state if record is invalid" do
