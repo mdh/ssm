@@ -5,6 +5,7 @@ gem 'activerecord', '~> 2.3.5'
 require 'active_record'
 require 'examples/user'
 
+ActiveRecord::Base.logger = Logger.new STDOUT
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
 def setup_db
@@ -68,6 +69,15 @@ describe ActiveRecord do
       User.find(user.id).activation_code.should_not be_nil
     end
 
+    it "persist transitions even when state is attr_protected" do
+      user_class = Class.new(User)
+      user_class.instance_eval { attr_protected :state }
+      user = user_class.create!(:name => 'name', :state => 'x')
+      user.should be_new
+      user.invite_and_save
+      user.reload.should be_invited
+    end
+
     it "persists transitions when using send and a symbol" do
       user = User.create!(:name => 'name')
       user.send(:invite_and_save).should == true
@@ -107,6 +117,15 @@ describe ActiveRecord do
       user.invite_and_save!.should == true
       User.find(user.id).should be_invited
       User.find(user.id).activation_code.should_not be_nil
+    end
+
+    it "persist transitions even when state is attr_protected" do
+      user_class = Class.new(User)
+      user_class.instance_eval { attr_protected :state }
+      user = user_class.create!(:name => 'name', :state => 'x')
+      user.should be_new
+      user.invite_and_save!
+      user.reload.should be_invited
     end
 
     it "raises an error if an invalid state_transition is called" do
