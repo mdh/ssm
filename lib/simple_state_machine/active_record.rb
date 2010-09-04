@@ -8,6 +8,10 @@ module SimpleStateMachine::ActiveRecord
 
   class Decorator < SimpleStateMachine::Decorator
 
+    # decorates subject with:
+    # * {event_name}_and_save
+    # * {event_name}_and_save!
+    # * {event_name}!
     def decorate transition
       super transition
       event_name = transition.event_name.to_s

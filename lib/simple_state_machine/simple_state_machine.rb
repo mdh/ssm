@@ -7,6 +7,7 @@ module SimpleStateMachine
   # Adds state machine methods to extended class 
   module StateMachineMixin
 
+    # mark the method as an event and specify how the state should transition 
     def event event_name, state_transitions
       state_transitions.each do |from, to|
         transition = state_machine_definition.add_transition(event_name, from, to)
@@ -59,18 +60,21 @@ module SimpleStateMachine
   end
   
   ##
-  # The state machine used by the instance
+  # Defines the state machine used by the instance
   class StateMachine
 
     def initialize(subject)
       @subject = subject
     end
-  
+
+    # returns the next state for the subject for event_name
     def next_state(event_name)
       transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.send(state_method).to_s == t.from.to_s}.first
       transition ? transition.to : nil
     end
-  
+
+    # transitions to the next state if next_state exists
+    # calls illegal_event_callback event_name if no next_state is found
     def transition(event_name)
       if to = next_state(event_name)
         result = yield
@@ -105,8 +109,8 @@ module SimpleStateMachine
         state_machine_definition.state_method
       end
 
+      # override with your own implementation, like setting errors in your model
       def illegal_event_callback event_name
-        # override with your own implementation, like setting errors in your model
         raise Error.new("You cannot '#{event_name}' when state is '#{@subject.state}'")
       end
   
