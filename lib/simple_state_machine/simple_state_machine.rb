@@ -73,8 +73,9 @@ module SimpleStateMachine
       transition ? transition.to : nil
     end
 
-    def error_state(event_name, e)
-      transition = transitions.select{|t| t.is_error_transition_for?(event_name, e) }.first
+    # Returns the error state for the subject for event_name and error
+    def error_state(event_name, error)
+      transition = transitions.select{|t| t.is_error_transition_for?(event_name, error) }.first
       transition ? transition.to : nil
     end
 
