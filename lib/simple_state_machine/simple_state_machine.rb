@@ -69,12 +69,12 @@ module SimpleStateMachine
 
     # Returns the next state for the subject for event_name
     def next_state(event_name)
-      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.send(state_method).to_s == t.from.to_s}.first
+      transition = transitions.select{|t| t.is_transition_for?(event_name) && @subject.send(state_method).to_s == t.from.to_s}.first
       transition ? transition.to : nil
     end
 
     def error_state(event_name, e)
-      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && e.class == t.from}.first
+      transition = transitions.select{|t| t.is_error_transition_for?(event_name, e) }.first
       transition ? transition.to : nil
     end
 
@@ -136,6 +136,14 @@ module SimpleStateMachine
       @event_name = event_name.to_s
       @from       = from.is_a?(Class) ? from : from.to_s
       @to         = to.to_s
+    end
+
+    def is_transition_for?(event_name)
+      self.event_name == event_name.to_s
+    end
+
+    def is_error_transition_for?(event_name, error)
+      is_transition_for?(event_name) && error.class == from
     end
   end
 
