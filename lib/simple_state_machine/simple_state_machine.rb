@@ -49,7 +49,7 @@ module SimpleStateMachine
     end
     
     def add_transition event_name, from, to
-      transition = Transition.new(event_name.to_s, from.to_s, to.to_s)
+      transition = Transition.new(event_name, from, to)
       transitions << transition
       transition
     end
@@ -67,17 +67,31 @@ module SimpleStateMachine
       @subject = subject
     end
 
-    # returns the next state for the subject for event_name
+    # Returns the next state for the subject for event_name
     def next_state(event_name)
       transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && @subject.send(state_method).to_s == t.from.to_s}.first
       transition ? transition.to : nil
     end
 
-    # transitions to the next state if next_state exists
-    # calls illegal_event_callback event_name if no next_state is found
+    def error_state(event_name, e)
+      transition = transitions.select{|t| t.event_name.to_s == event_name.to_s && e.class == t.from}.first
+      transition ? transition.to : nil
+    end
+
+    # Transitions to the next state if next_state exists.
+    # Calls illegal_event_callback event_name if no next_state is found
     def transition(event_name)
       if to = next_state(event_name)
-        result = yield
+        begin
+          result = yield
+        rescue => e
+          if error_state = error_state(event_name, e)
+            @subject.send("#{state_method}=", error_state)
+            return result
+          else
+            raise
+          end
+        end
         # TODO refactor out to AR module
         if defined?(::ActiveRecord) && @subject.is_a?(::ActiveRecord::Base)
           if @subject.errors.entries.empty?
@@ -116,7 +130,13 @@ module SimpleStateMachine
   
   end
 
-  class Transition < Struct.new(:event_name, :from, :to)
+  class Transition 
+    attr_reader :event_name, :from, :to
+    def initialize(event_name, from, to)
+      @event_name = event_name.to_s
+      @from       = from.is_a?(Class) ? from : from.to_s
+      @to         = to.to_s
+    end
   end
 
   ##
