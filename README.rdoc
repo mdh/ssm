@@ -36,6 +36,14 @@ This will prevent the state from being changed.
     end
   end
 
+=== Example usage with exceptions
+You can rescue exceptions and specify the failure state
+
+  def download_data
+    Service.download_data
+  end
+  event :download_data, :pending => :downloaded,
+        Service::ConnectionError => :download_failed
 
 == More complete implementation
 
