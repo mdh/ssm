@@ -4,7 +4,7 @@ module SimpleStateMachine
   end
 
   ##
-  # Adds state machine methods to extended class 
+  # Adds state machine methods to the extended class 
   module StateMachineMixin
 
     # mark the method as an event and specify how the state should transition 
@@ -53,7 +53,7 @@ module SimpleStateMachine
       transitions << transition
       transition
     end
-    
+     
     def state_method
       @state_method ||= :state
     end      
@@ -131,6 +131,8 @@ module SimpleStateMachine
   
   end
 
+  ##
+  # Defines transitions for events
   class Transition 
     attr_reader :event_name, :from, :to
     def initialize(event_name, from, to)
@@ -139,17 +141,19 @@ module SimpleStateMachine
       @to         = to.to_s
     end
 
+    # returns true if it's a transition for event_name
     def is_transition_for?(event_name)
       self.event_name == event_name.to_s
     end
 
+    # returns true if it's a error transition for event_name and error
     def is_error_transition_for?(event_name, error)
       is_transition_for?(event_name) && error.class == from
     end
   end
 
   ##
-  # Decorates the extended class with methods to access the state machine
+  # Decorates @subject with methods to access the state machine
   class Decorator
 
     def initialize(subject)
