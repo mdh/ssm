@@ -14,6 +14,17 @@ class SimpleExample
   event :event2, :state2 => :state3
 end
 
+class SimpleExampleWithCustomStateMethod
+  extend SimpleStateMachine
+  state_machine_definition.state_method = :ssm_state
+
+  def initialize(state = 'state1')
+    @ssm_state = state
+  end
+  event :event1, :state1 => :state2
+  event :event2, :state2 => :state3
+end
+
 describe SimpleStateMachine do
  
   it "has an error that extends RuntimeError" do
@@ -72,6 +83,15 @@ describe SimpleStateMachine do
       example.event1
       example.event2
       example.event2_called.should == true
+    end
+
+  end
+
+  describe 'custom state method' do
+    
+    it "raise an error if an invalid state_transition is called" do
+      example = SimpleExampleWithCustomStateMethod.new
+      lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
     end
 
   end

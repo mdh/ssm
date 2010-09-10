@@ -126,7 +126,7 @@ module SimpleStateMachine
 
       # override with your own implementation, like setting errors in your model
       def illegal_event_callback event_name
-        raise Error.new("You cannot '#{event_name}' when state is '#{@subject.state}'")
+        raise Error.new("You cannot '#{event_name}' when state is '#{@subject.send(state_method)}'")
       end
   
   end
