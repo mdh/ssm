@@ -71,7 +71,7 @@ module SimpleStateMachine
 
     # Returns the next state for the subject for event_name
     def next_state(event_name)
-      transition = transitions.select{|t| t.is_transition_for?(event_name) && @subject.send(state_method).to_s == t.from.to_s}.first
+      transition = transitions.select{|t| t.is_transition_for?(event_name, @subject.send(state_method))}.first
       transition ? transition.to : nil
     end
 
@@ -144,14 +144,24 @@ module SimpleStateMachine
     end
 
     # returns true if it's a transition for event_name
-    def is_transition_for?(event_name)
-      self.event_name == event_name.to_s
+    def is_transition_for?(event_name, subject_state)
+      is_same_event?(event_name) && is_same_from?(subject_state)
     end
 
     # returns true if it's a error transition for event_name and error
     def is_error_transition_for?(event_name, error)
-      is_transition_for?(event_name) && error.class == from
+      is_same_event?(event_name) && error.class == from
     end
+
+    private
+
+      def is_same_event?(event_name)
+        self.event_name == event_name.to_s
+      end
+
+      def is_same_from?(subject_from)
+        from.to_s == 'all' || subject_from.to_s == from.to_s
+      end
   end
 
   ##

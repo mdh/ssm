@@ -13,6 +13,7 @@ class SimpleExample
   end
   event :event2, :state2 => :state3
   event :event_with_multiple_from, [:state1, :state2] => :state3
+  event :event_from_all, :all => :state3
 end
 
 class SimpleExampleWithCustomStateMethod
@@ -54,6 +55,16 @@ describe SimpleStateMachine do
       example = SimpleExample.new 'state2'
       example.should be_state2
       example.event_with_multiple_from
+      example.should be_state3
+    end
+
+    it "changes state if event has all as from" do
+      example = SimpleExample.new
+      example.event_from_all
+      example.should be_state3
+      example = SimpleExample.new 'state2'
+      example.should be_state2
+      example.event_from_all
       example.should be_state3
     end
 
