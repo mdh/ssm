@@ -83,12 +83,14 @@ To add a state machine with ActiveRecord persistence:
     class User < ActiveRecord::Base
        
       extend SimpleStateMachine::ActiveRecord
-      
+      # define a custum state_method (state is default)
+      state_machine_definition.state_method = :ssm_state
+
       def after_initialize
-        self.state ||= 'new'
+        self.ssm_state ||= 'new'
         # if you get an ActiveRecord::MissingAttributeError
         # you'll probably need to do (http://bit.ly/35q23b):
-        #   write_attribute(:state, "new") unless read_attribute(:state)
+        #   write_attribute(:ssm_state, "new") unless read_attribute(:ssm_state)
       end
       
       def invite
@@ -104,6 +106,8 @@ To add a state machine with ActiveRecord persistence:
       end
       event :confirm_invitation, :invited => :active
       
+      # :all can be used to catch all from states
+      event :suspend, :all => :suspended
     end
 
 This generates the following methods

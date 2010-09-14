@@ -28,7 +28,6 @@ class Conversation
   end
 
   event :view,  :unread => :read
-  event :close, :unread => :closed,
-                :read   => :closed
+  event :close, :all    => :closed
 
 end

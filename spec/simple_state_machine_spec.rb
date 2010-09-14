@@ -111,6 +111,15 @@ describe SimpleStateMachine do
 
   describe 'custom state method' do
     
+    it "changes state when calling events" do
+      example = SimpleExampleWithCustomStateMethod.new
+      example.should be_state1
+      example.event1
+      example.should be_state2
+      example.event2
+      example.should be_state3
+    end    
+    
     it "raise an error if an invalid state_transition is called" do
       example = SimpleExampleWithCustomStateMethod.new
       lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
