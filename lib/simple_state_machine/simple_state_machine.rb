@@ -9,9 +9,11 @@ module SimpleStateMachine
 
     # mark the method as an event and specify how the state should transition 
     def event event_name, state_transitions
-      state_transitions.each do |from, to|
-        transition = state_machine_definition.add_transition(event_name, from, to)
-        state_machine_decorator(self).decorate(transition)
+      state_transitions.each do |froms, to|
+        [froms].flatten.each do |from|
+          transition = state_machine_definition.add_transition(event_name, from, to)
+          state_machine_decorator(self).decorate(transition)
+        end
       end
     end
 

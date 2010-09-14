@@ -12,6 +12,7 @@ class SimpleExample
     'event2'
   end
   event :event2, :state2 => :state3
+  event :event_with_multiple_from, [:state1, :state2] => :state3
 end
 
 class SimpleExampleWithCustomStateMethod
@@ -37,12 +38,22 @@ describe SimpleStateMachine do
 
   describe "events" do
 
-    it "changes state" do
+    it "changes state if event has multiple transitions" do
       example = SimpleExample.new
       example.should be_state1
       example.event1
       example.should be_state2
       example.event1
+      example.should be_state3
+    end
+
+    it "changes state if event has multiple froms" do
+      example = SimpleExample.new
+      example.event_with_multiple_from
+      example.should be_state3
+      example = SimpleExample.new 'state2'
+      example.should be_state2
+      example.event_with_multiple_from
       example.should be_state3
     end
 
@@ -72,7 +83,7 @@ describe SimpleStateMachine do
       lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
     end
 
-    it "return nil" do
+    it "returns what the decorated method returns" do
       example = SimpleExample.new
       example.event1.should == nil
       example.event2.should == 'event2'
