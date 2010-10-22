@@ -1,11 +1,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-require 'rubygems'
-gem 'activerecord', '~> 2.3.5'
+require "rubygems"
+require "bundler"
+Bundler.require
+#Bundler.setup(:test)#, :activerecord)
 require 'active_record'
 require 'examples/user'
 
-ActiveRecord::Base.logger = Logger.new STDOUT
+#ActiveRecord::Base.logger = Logger.new STDOUT
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
 def setup_db
