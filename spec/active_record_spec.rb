@@ -7,7 +7,7 @@ Bundler.require
 require 'active_record'
 require 'examples/user'
 
-#ActiveRecord::Base.logger = Logger.new STDOUT
+ActiveRecord::Base.logger = Logger.new STDOUT
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
 
 def setup_db
