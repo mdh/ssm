@@ -1,6 +1,7 @@
 GEM
   remote: http://rubygems.org/
   specs:
+    ZenTest (4.4.2)
     activerecord (2.3.10)
       activesupport (= 2.3.10)
     activesupport (2.3.10)
@@ -21,6 +22,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  ZenTest
   activerecord (~> 2.3.5)
   rspec
   sqlite3-ruby
