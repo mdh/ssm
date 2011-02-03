@@ -7,24 +7,23 @@ Bundler.require
 require 'active_record'
 require 'examples/user'
 
-ActiveRecord::Base.logger = Logger.new STDOUT
-ActiveRecord::Base.establish_connection(:adapter => "sqlite3", :dbfile => ":memory:")
+ActiveRecord::Base.logger = Logger.new "test.log"
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
+                                        :dbfile  => ":memory:")
 
 def setup_db
   ActiveRecord::Schema.define(:version => 1) do    
     create_table :users do |t|
-      t.column :id, :integer
-      t.column :name, :string
-      t.column :state, :string
-      t.column :activation_code, :string
-      t.column :created_at, :datetime
-      t.column :updated_at, :datetime
+      t.column :id,               :integer
+      t.column :name,             :string
+      t.column :state,            :string
+      t.column :activation_code,  :string
+      t.column :created_at,       :datetime
+      t.column :updated_at,       :datetime
     end
-  end
-  ActiveRecord::Schema.define(:version => 1) do    
     create_table :tickets do |t|
-      t.column :id, :integer
-      t.column :ssm_state, :string
+      t.column :id,         :integer
+      t.column :ssm_state,  :string
     end
   end
 end
@@ -89,8 +88,10 @@ describe ActiveRecord do
 
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
-      l = lambda { user.confirm_invitation_and_save 'abc' }
-      l.should raise_error(SimpleStateMachine::Error, "You cannot 'confirm_invitation' when state is 'new'")
+      expect { 
+        user.confirm_invitation_and_save 'abc' 
+      }.to raise_error(SimpleStateMachine::Error, 
+                       "You cannot 'confirm_invitation' when state is 'new'")
     end
 
     it "returns false and keeps state if record is invalid" do
@@ -132,16 +133,20 @@ describe ActiveRecord do
 
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
-      l = lambda { user.confirm_invitation_and_save! 'abc' }
-      l.should raise_error(SimpleStateMachine::Error, "You cannot 'confirm_invitation' when state is 'new'")
+      expect { 
+        user.confirm_invitation_and_save! 'abc' 
+      }.to raise_error(SimpleStateMachine::Error, 
+                       "You cannot 'confirm_invitation' when state is 'new'")
     end
 
     it "raises a RecordInvalid and keeps state if record is invalid" do
       user = User.new
       user.should be_new
       user.should_not be_valid
-      l = lambda { user.invite_and_save! }
-      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
+      expect { 
+        user.invite_and_save! 
+      }.to raise_error(ActiveRecord::RecordInvalid, 
+                       "Validation failed: Name can't be blank")
       user.should be_new
     end
 
@@ -149,8 +154,10 @@ describe ActiveRecord do
       user = User.create!(:name => 'name')
       user.invite_and_save!
       user.should be_invited
-      l = lambda { user.confirm_invitation_and_save!('x') }
-      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid")
+      expect { 
+        user.confirm_invitation_and_save!('x') 
+      }.to raise_error(ActiveRecord::RecordInvalid, 
+                       "Validation failed: Activation code is invalid")
       user.should be_invited
     end
 
@@ -169,8 +176,7 @@ describe ActiveRecord do
       user = User.new
       user.should be_new
       user.should_not be_valid
-      l = lambda { user.invite! }
-      l.should raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
+      expect { user.invite! }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
       user.should be_new
     end
 
@@ -193,4 +199,6 @@ describe ActiveRecord do
     end
 
   end
+
 end
+

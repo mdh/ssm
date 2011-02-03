@@ -1,4 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'cgi'
 
 class SimpleExample
   extend SimpleStateMachine
@@ -128,6 +129,7 @@ describe SimpleStateMachine do
   end
 
   describe "state_machine_definition" do
+
     it "is inherited by subclasses" do
       example = Class.new(SimpleExample).new
       example.should be_state1
@@ -136,6 +138,28 @@ describe SimpleStateMachine do
       example.event1
       example.should be_state3
     end
+
+    it "has a list of transitions" do
+      smd = SimpleExample.state_machine_definition
+      smd.transitions.should be_a(Array)
+      smd.transitions.first.should be_a(SimpleStateMachine::Transition)
+    end
+
+    it "converts to readable string format" do
+      smd = SimpleExample.state_machine_definition
+      smd.to_s.should =~ Regexp.new("state1.event1! => state2")
+    end
+
+    it "converts to graphiz dot format" do
+      smd = SimpleExample.state_machine_definition
+      smd.to_graphiz_dot.should =~ Regexp.new(%("state1"->"event1!"->"state2";"state2"->" event1!"->"state3";))
+    end
+
+    it "shows the state and event dependencies as a Google chart" do
+      smd = SimpleExample.state_machine_definition
+      smd.google_chart_url.should == "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape smd.to_graphiz_dot}}"
+    end
+
   end
 
   describe "state_machine" do
@@ -147,3 +171,4 @@ describe SimpleStateMachine do
   end
 
 end
+

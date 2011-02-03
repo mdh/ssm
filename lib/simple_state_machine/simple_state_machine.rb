@@ -1,4 +1,6 @@
 module SimpleStateMachine
+
+  require 'cgi'
   
   class Error < ::RuntimeError
   end
@@ -59,6 +61,26 @@ module SimpleStateMachine
     def state_method
       @state_method ||= :state
     end      
+
+    # Human readable format: old_state.event! => new_state 
+    def to_s
+      transitions.map(&:to_s).join("\n")
+    end
+
+    # Graphiz dot format for rendering as a directional graph
+    def to_graphiz_dot
+      event_count = Hash.new(0)
+      transitions.map do |transition|
+        occurences = event_count[transition.event_name] += 1
+        transition.to_graphiz_dot(occurences - 1)
+      end.join(";")
+    end
+
+    # Generates a url that renders states and events as a directional graph.
+    # See http://code.google.com/apis/chart/docs/gallery/graphviz.html
+    def google_chart_url
+      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphiz_dot}}"
+    end
   end
   
   ##
@@ -152,6 +174,16 @@ module SimpleStateMachine
     def is_error_transition_for?(event_name, error)
       is_same_event?(event_name) && error.class == from
     end
+
+    def to_s
+      "#{from}.#{event_name}! => #{to}"
+    end
+
+    def to_graphiz_dot(event_name_spaces=0)
+      spaces = ' ' * event_name_spaces
+      %("#{from}"->"#{spaces}#{event_name}!"->"#{to}")
+    end
+      
 
     private
 

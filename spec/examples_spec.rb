@@ -53,6 +53,7 @@ describe "Examples" do
       conversation.close
       conversation.should be_closed
     end
+
   end
 
 end
