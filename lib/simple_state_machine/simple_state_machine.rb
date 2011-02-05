@@ -2,7 +2,7 @@ module SimpleStateMachine
 
   require 'cgi'
   
-  class Error < ::RuntimeError
+  class IllegalStateTransitionError < ::RuntimeError
   end
 
   ##
@@ -150,7 +150,7 @@ module SimpleStateMachine
 
       # override with your own implementation, like setting errors in your model
       def illegal_event_callback event_name
-        raise Error.new("You cannot '#{event_name}' when state is '#{@subject.send(state_method)}'")
+        raise IllegalStateTransitionError.new("You cannot '#{event_name}' when state is '#{@subject.send(state_method)}'")
       end
   
   end
@@ -223,7 +223,7 @@ module SimpleStateMachine
       end
 
       def define_state_helper_method state
-        unless @subject.method_defined?("#{state.to_s}?")
+        unless any_method_defined?("#{state.to_s}?")
           @subject.send(:define_method, "#{state.to_s}?") do
             self.send(self.class.state_machine_definition.state_method) == state.to_s
           end
@@ -231,7 +231,7 @@ module SimpleStateMachine
       end
 
       def define_event_method event_name
-        unless @subject.method_defined?("#{event_name}")
+        unless any_method_defined?("#{event_name}")
           @subject.send(:define_method, "#{event_name}") {}
         end
       end
@@ -250,7 +250,7 @@ module SimpleStateMachine
       end
 
       def define_state_setter_method
-        unless @subject.method_defined?("#{state_method}=")
+        unless any_method_defined?("#{state_method}=")
           @subject.send(:define_method, "#{state_method}=") do |new_state|
             instance_variable_set(:"@#{self.class.state_machine_definition.state_method}", new_state)
           end
@@ -258,9 +258,15 @@ module SimpleStateMachine
       end
 
       def define_state_getter_method
-        unless @subject.method_defined?(state_method)
+        unless any_method_defined?(state_method)
           @subject.send(:attr_reader, state_method)
         end
+      end
+      
+      def any_method_defined?(method)
+        @subject.method_defined?(method) ||
+        @subject.protected_method_defined?(method) ||
+        @subject.private_method_defined?(method)
       end
 
     protected

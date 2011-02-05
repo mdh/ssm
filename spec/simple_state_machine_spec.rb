@@ -31,7 +31,7 @@ end
 describe SimpleStateMachine do
  
   it "has an error that extends RuntimeError" do
-    SimpleStateMachine::Error.superclass.should == RuntimeError
+    SimpleStateMachine::IllegalStateTransitionError.superclass.should == RuntimeError
   end
 
   it "has a default state" do
@@ -92,7 +92,7 @@ describe SimpleStateMachine do
     
     it "raise an error if an invalid state_transition is called" do
       example = SimpleExample.new
-      lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
+      lambda { example.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
 
     it "returns what the decorated method returns" do
@@ -123,7 +123,7 @@ describe SimpleStateMachine do
     
     it "raise an error if an invalid state_transition is called" do
       example = SimpleExampleWithCustomStateMethod.new
-      lambda { example.event2 }.should raise_error(SimpleStateMachine::Error, "You cannot 'event2' when state is 'state1'")
+      lambda { example.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
 
   end
@@ -152,7 +152,8 @@ describe SimpleStateMachine do
 
     it "converts to graphiz dot format" do
       smd = SimpleExample.state_machine_definition
-      smd.to_graphiz_dot.should =~ Regexp.new(%("state1"->"event1!"->"state2";"state2"->" event1!"->"state3";))
+      smd.to_graphiz_dot.should =~ Regexp.new(%("state1"->"event1!"->"state2";))
+      smd.to_graphiz_dot.should =~ Regexp.new(%("state2"->" event1!"->"state3";))
     end
 
     it "shows the state and event dependencies as a Google chart" do

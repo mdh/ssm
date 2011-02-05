@@ -90,7 +90,7 @@ describe ActiveRecord do
       user = User.create!(:name => 'name')
       expect { 
         user.confirm_invitation_and_save 'abc' 
-      }.to raise_error(SimpleStateMachine::Error, 
+      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError, 
                        "You cannot 'confirm_invitation' when state is 'new'")
     end
 
@@ -135,7 +135,7 @@ describe ActiveRecord do
       user = User.create!(:name => 'name')
       expect { 
         user.confirm_invitation_and_save! 'abc' 
-      }.to raise_error(SimpleStateMachine::Error, 
+      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError, 
                        "You cannot 'confirm_invitation' when state is 'new'")
     end
 
