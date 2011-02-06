@@ -6,47 +6,63 @@ module SimpleStateMachine
   end
 
   ##
-  # Adds state machine methods to the extended class 
-  module StateMachineMixin
-
-    # mark the method as an event and specify how the state should transition 
-    def event event_name, state_transitions
-      state_transitions.each do |froms, to|
-        [froms].flatten.each do |from|
-          transition = state_machine_definition.add_transition(event_name, from, to)
-          state_machine_decorator(self).decorate(transition)
-        end
-      end
-    end
-
+  # Allows class to mount a state_machine
+  module Mountable
     def state_machine_definition
-      @state_machine_definition ||= StateMachineDefinition.new
+      unless @state_machine_definition
+        @state_machine_definition = StateMachineDefinition.new
+        @state_machine_definition.lazy_decorator = lambda { Decorator.new(self) }
+      end
+      @state_machine_definition
     end
 
     def state_machine_definition= state_machine_definition
       @state_machine_definition = state_machine_definition
       state_machine_definition.transitions.each do |transition|
-        state_machine_decorator(self).decorate(transition)
+        state_machine_definition.decorator.decorate(transition)
       end
     end
-    
-    def state_machine_decorator subject
-      Decorator.new subject
+  end
+  include Mountable
+
+  ##
+  # Adds state machine methods to the extended class 
+  module Extendable
+
+    # mark the method as an event and specify how the state should transition 
+    def event event_name, state_transitions
+      state_transitions.each do |froms, to|
+        [froms].flatten.each do |from|
+          state_machine_definition.add_transition(event_name, from, to)
+        end
+      end
     end
 
+  end
+  include Extendable
+
+  ##
+  # Allows subclasses to inherit state machines
+  module Inheritable
     def inherited(subclass)
       subclass.state_machine_definition = state_machine_definition.clone
+      decorator = state_machine_definition.decorator
+      decorator.subject = subclass
+      subclass.state_machine_definition.decorator = decorator
       super
     end
   end
-
-  include StateMachineMixin
+  include Inheritable
   
   ##
   # Defines state machine transitions
   class StateMachineDefinition
 
-    attr_writer :state_method
+    attr_writer :state_method, :decorator, :lazy_decorator
+
+    def decorator
+      @decorator ||= @lazy_decorator.call
+    end
 
     def transitions
       @transitions ||= []
@@ -55,7 +71,7 @@ module SimpleStateMachine
     def add_transition event_name, from, to
       transition = Transition.new(event_name, from, to)
       transitions << transition
-      transition
+      decorator.decorate(transition)
     end
      
     def state_method
@@ -87,6 +103,7 @@ module SimpleStateMachine
   # Defines the state machine used by the instance
   class StateMachine
 
+    # TODO rename subject to instance
     def initialize(subject)
       @subject = subject
     end
@@ -200,6 +217,7 @@ module SimpleStateMachine
   # Decorates @subject with methods to access the state machine
   class Decorator
 
+    attr_writer :subject
     def initialize(subject)
       @subject = subject
       define_state_machine_method

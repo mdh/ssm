@@ -1,10 +1,8 @@
 module SimpleStateMachine::ActiveRecord
 
-  include SimpleStateMachine::StateMachineMixin
-  
-  def state_machine_decorator subject
-    Decorator.new subject
-  end
+  include SimpleStateMachine::Mountable
+  include SimpleStateMachine::Extendable
+  include SimpleStateMachine::Inheritable
 
   class Decorator < SimpleStateMachine::Decorator
 
@@ -60,5 +58,12 @@ module SimpleStateMachine::ActiveRecord
     def define_state_getter_method; end
 
   end
-
+  
+  def state_machine_definition
+    unless @state_machine_definition
+      @state_machine_definition = SimpleStateMachine::StateMachineDefinition.new
+      @state_machine_definition.lazy_decorator = lambda { Decorator.new(self) }
+    end
+    @state_machine_definition
+  end
 end

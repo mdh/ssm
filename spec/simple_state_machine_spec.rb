@@ -80,7 +80,7 @@ describe SimpleStateMachine do
       class_with_error = Class.new(SimpleExample)
       class_with_error.instance_eval do
         define_method :raise_error do
-          raise
+          raise RuntimeError.new
         end
         event :raise_error, :state1 => :state2, RuntimeError => :failed
       end
