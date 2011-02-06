@@ -71,7 +71,7 @@ describe SimpleStateMachine do
       example.should be_state2
     end
 
-    it "changes state to error_state when error should be caught" do
+    it "changes state to error_state when error can be caught" do
       class_with_error = Class.new(@klass)
       class_with_error.instance_eval do
         define_method :raise_error do
@@ -85,7 +85,7 @@ describe SimpleStateMachine do
       example.should be_failed
     end
     
-    it "raise an error if an invalid state_transition is called" do
+    it "raises an error if an invalid state_transition is called" do
       klass = Class.new(@klass)
       klass.instance_eval do
         event :event,  :state1 => :state2
