@@ -103,7 +103,6 @@ module SimpleStateMachine
   # Defines the state machine used by the instance
   class StateMachine
 
-    # TODO rename subject to instance
     def initialize(subject)
       @subject = subject
     end
