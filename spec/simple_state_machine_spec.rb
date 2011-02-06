@@ -1,22 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'cgi'
 
-class SimpleExample
-  extend SimpleStateMachine
-  attr_reader :event2_called
-  def initialize(state = 'state1')
-    @state = state
-  end
-  event :event1, :state1 => :state2, :state2 => :state3
-  def event2
-    @event2_called = true
-    'event2'
-  end
-  event :event2, :state2 => :state3
-  event :event_with_multiple_from, [:state1, :state2] => :state3
-  event :event_from_all, :all => :state3
-end
-
 class SimpleExampleWithCustomStateMethod
   extend SimpleStateMachine
   state_machine_definition.state_method = :ssm_state
@@ -34,50 +18,72 @@ describe SimpleStateMachine do
     SimpleStateMachine::IllegalStateTransitionError.superclass.should == RuntimeError
   end
 
-  it "has a default state" do
-    SimpleExample.new.state.should == 'state1'
-  end
+  describe ".event" do
 
-  describe "events" do
+    before do
+      @klass = Class.new do
+        extend SimpleStateMachine
+        def initialize(state = 'state1')
+          @state = state
+        end
+      end
+    end
 
     it "changes state if event has multiple transitions" do
-      example = SimpleExample.new
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :event, :state1 => :state2, :state2 => :state3
+      end
+      example = klass.new
       example.should be_state1
-      example.event1
+      example.event
       example.should be_state2
-      example.event1
+      example.event
       example.should be_state3
     end
 
     it "changes state if event has multiple froms" do
-      example = SimpleExample.new
-      example.event_with_multiple_from
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :event, [:state1, :state2] => :state3
+      end
+      example = klass.new
+      example.event
       example.should be_state3
-      example = SimpleExample.new 'state2'
+      example = klass.new 'state2'
       example.should be_state2
-      example.event_with_multiple_from
+      example.event
       example.should be_state3
     end
 
     it "changes state if event has all as from" do
-      example = SimpleExample.new
-      example.event_from_all
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :other_event, :state1 => :state2
+        event :event, :all => :state3
+      end
+      example = klass.new
+      example.event
       example.should be_state3
-      example = SimpleExample.new 'state2'
+      example = klass.new 'state2'
       example.should be_state2
-      example.event_from_all
+      example.event
       example.should be_state3
     end
 
     it "changes state when state is a symbol instead of a string" do
-      example = SimpleExample.new :state1
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :event, :state1 => :state2
+      end  
+      example = klass.new :state1
       example.state.should == :state1
-      example.send(:event1)
+      example.send(:event)
       example.should be_state2
     end
 
     it "changes state to error_state when error should be caught" do
-      class_with_error = Class.new(SimpleExample)
+      class_with_error = Class.new(@klass)
       class_with_error.instance_eval do
         define_method :raise_error do
           raise RuntimeError.new
@@ -91,21 +97,41 @@ describe SimpleStateMachine do
     end
     
     it "raise an error if an invalid state_transition is called" do
-      example = SimpleExample.new
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :event,  :state1 => :state2
+        event :event2, :state2 => :state3
+      end  
+      example = klass.new
       lambda { example.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
 
     it "returns what the decorated method returns" do
-      example = SimpleExample.new
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        event :event1,  :state1 => :state2
+        define_method :event2 do
+          'event2'
+        end
+        event :event2, :state2 => :state3
+      end  
+      example = klass.new
       example.event1.should == nil
       example.event2.should == 'event2'
     end
 
     it "calls existing methods" do
-      example = SimpleExample.new
-      example.event1
-      example.event2
-      example.event2_called.should == true
+      klass = Class.new(@klass)
+      klass.instance_eval do
+        attr_accessor :event_called
+        define_method :event do
+          @event_called = true
+        end
+        event :event, :state1 => :state2
+      end  
+      example = klass.new
+      example.event
+      example.event_called.should == true
     end
 
   end
@@ -129,10 +155,24 @@ describe SimpleStateMachine do
   end
 
   describe "state_machine" do
-    it "has a next_state method" do
-      example = SimpleExample.new
-      example.state_machine.next_state('event1').should == 'state2'
-      example.state_machine.next_state('event2').should be_nil
+    describe "#next_state" do
+      before do
+        klass = Class.new do
+          extend SimpleStateMachine
+          def initialize() @state = 'state1' end
+          event :event1, :state1 => :state2
+          event :event2, :state2 => :state3
+        end
+        @subject = klass.new.state_machine
+      end
+
+      it "returns the next state for the event and current state" do
+        @subject.next_state('event1').should == 'state2'
+      end
+
+      it "returns nil if no next state for the event and current state exists" do
+        @subject.next_state('event2').should be_nil
+      end
     end
   end
 
