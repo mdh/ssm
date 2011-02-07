@@ -85,11 +85,7 @@ module SimpleStateMachine
 
     # Graphiz dot format for rendering as a directional graph
     def to_graphiz_dot
-      event_count = Hash.new(0)
-      transitions.map do |transition|
-        occurences = event_count[transition.event_name] += 1
-        transition.to_graphiz_dot(occurences - 1)
-      end.join(";")
+      transitions.map { |t| t.to_graphiz_dot }.join(";")
     end
 
     # Generates a url that renders states and events as a directional graph.
@@ -195,9 +191,8 @@ module SimpleStateMachine
       "#{from}.#{event_name}! => #{to}"
     end
 
-    def to_graphiz_dot(event_name_spaces=0)
-      spaces = ' ' * event_name_spaces
-      %("#{from}"->"#{spaces}#{event_name}!"->"#{to}")
+    def to_graphiz_dot
+      %("#{from}"->"#{to}"[label=#{event_name}])
     end
       
 

@@ -75,13 +75,13 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   describe "#to_graphiz_dot" do
     it "converts to graphiz dot format" do
-      @smd.to_graphiz_dot.should =~ Regexp.new(%("state1"->"event1!"->"state2";))
-      @smd.to_graphiz_dot.should =~ Regexp.new(%("state2"->" event1!"->"state3"))
+      @smd.to_graphiz_dot.should ==  %("state1"->"state2"[label=event1];"state2"->"state3"[label=event1])
     end
   end
 
   describe "#google_chart_url" do
     it "shows the state and event dependencies as a Google chart" do
+      puts "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape @smd.to_graphiz_dot}}"
       @smd.google_chart_url.should == "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape @smd.to_graphiz_dot}}"
     end
   end
