@@ -163,6 +163,25 @@ describe ActiveRecord do
 
   end
 
+  describe "event" do
+
+    it "does not persist transitions" do
+      user = User.create!(:name => 'name')
+      user.invite.should == true
+      User.find(user.id).should_not be_invited
+      User.find(user.id).activation_code.should be_nil
+    end
+
+    it "returns false and keeps state if record is invalid" do    
+      user = User.new
+      user.should be_new
+      user.should_not be_valid
+      user.invite.should == false
+      user.should be_new
+    end
+
+  end
+
   describe "event!" do
 
     it "persists transitions" do
