@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
 
   s.authors = ["Marek de Heus", "Petrik de Heus"]
-  s.description = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
+  s.description = %q{Simple State Machine is a state machine that focuses on events instead of states}
   s.email = ["FIX@example.com"]
   s.homepage = %q{http://github.com/mdh/ssm}
   s.extra_rdoc_files = [
@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.7}
-  s.summary = %q{A statemachine that focuses on events instead of states}
+  s.summary = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.add_development_dependency "rake"
   s.add_development_dependency "ZenTest"
