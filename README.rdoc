@@ -53,25 +53,32 @@ To add a state machine:
 - turn methods into events
 
     class LampWithHotelSwitch
-      
+
       extend SimpleStateMachine
-      
+
       def initialize
-        self.state = :off
+        self.state = 'off'
       end
-      
+
       def push_switch_1
-        puts 'pushed switch 1 #{state}'
+        puts "pushed switch 1 #{state}"
       end
       event :push_switch_1, :off => :on,
                             :on  => :off
-      
+
       # define another event
       # note that implementation of :push_switch_2 is optional
       event :push_switch_2, :off => :on,
                             :on  => :off
-      
+
     end
+
+    lamp = LampWithHotelSwitch.new
+    lamp.state => :off
+    lamp.push_switch_1
+    lamp.state => :on
+    lamp.push_siwtch_2
+    lamp
 
 == ActiveRecord Example
 
