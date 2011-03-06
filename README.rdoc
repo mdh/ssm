@@ -52,7 +52,7 @@ You can rescue exceptions and specify the failure state
   state # => "download_failed"
 
 === Catching all from states
-If an event should be called from all states you can use :all
+If an event should transition from all states you can use :all
 
   event :suspend, :all => :suspended
 
