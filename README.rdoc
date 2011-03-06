@@ -23,9 +23,8 @@ set the state to :active if the initial state is :pending.
 
   event :activate_account, :pending => :active
 
-
 That's it! 
-You can now call the method and the state will automatically change.
+You can now call `activate_account` and the state will automatically change.
 If the state change is not allowed, a SimpleStateMachine::Error is raised.
 
 === Example usage with ActiveRecord / ActiveModel
@@ -38,7 +37,9 @@ This will prevent the state from being changed.
     end
   end
 
-=== Example usage with exceptions
+  activate_account!("INVALID_CODE") # => ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
+
+=== Catching exceptions
 You can rescue exceptions and specify the failure state
 
   def download_data
@@ -46,6 +47,15 @@ You can rescue exceptions and specify the failure state
   end
   event :download_data, :pending => :downloaded,
         Service::ConnectionError => :download_failed
+
+  download_data! # catches Service::ConnectionError
+  state # => "download_failed"
+
+=== Catching all from states
+If an event should be called from all states you can use :all
+
+  event :suspend, :all => :suspended
+
 
 == More complete implementation
 
@@ -112,9 +122,6 @@ To add a state machine with ActiveRecord persistence:
         end
       end
       event :confirm_invitation, :invited => :active
-      
-      # :all can be used to catch all from states
-      event :suspend, :all => :suspended
     end
 
 This generates the following event methods
