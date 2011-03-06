@@ -74,8 +74,8 @@ You can rescue exceptions and specify the failure state
   event :download_data, :pending => :downloaded,
         Service::ConnectionError => :download_failed
 
-  download_data! # catches Service::ConnectionError
-  state          # => "download_failed"
+  download_data # catches Service::ConnectionError
+  state         # => "download_failed"
 
 === Catching all from states
 If an event should transition from all states you can use :all
@@ -115,6 +115,7 @@ To add a state machine with ActiveRecord persistence:
     end
 
 This generates the following event methods
+- invite
 - invite!
 - confirm_invitation!
 
@@ -124,7 +125,7 @@ And the following methods to query the state:
 - active?
 
 If you want to be more verbose you can also use:
-- invite_and_save  (behave like ActiveRecord save)
+- invite_and_save  (is equal to invite  and behaves like ActiveRecord save)
 - invite_and_save! (is equal to invite! and behaves like save!)
 
 == Mountable Example
