@@ -151,15 +151,6 @@ You can define your state machine in a seperate class:
         self.ssm_state ||= 'new'
       end
       
-      def invite
-        self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
-      end
-      
-      def confirm_invitation activation_code
-        if self.activation_code != activation_code
-          errors.add 'activation_code', 'is invalid'
-        end
-      end
     end
 
 
