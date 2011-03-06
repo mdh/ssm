@@ -4,6 +4,7 @@ A simple DSL to decorate existing methods with state transition guards.
 
 Instead of using a DSL to define events, SimpleStateMachine decorates methods 
 to help you encapsulate state and guard state transitions.
+It supports exception rescuing, graphiz visualization and mountable state_machines.
 
 == Example usage
 
@@ -127,6 +128,45 @@ And the following methods to query the state:
 If you want to be more verbose you can also use:
 - invite_and_save  (behave like ActiveRecord save)
 - invite_and_save! (is equal to invite! and behaves like save!)
+
+
+== Mountable Example
+
+You can define your state machine in a seperate class:
+
+    class MyStateMachine < SimpleStateMachine::StateMachineDefinition
+      def initialize(subject)
+        self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+        add_transition(:invite, :new, :invited)
+        add_transition(:confirm_invitation, :invited, :active)
+      end
+    end
+
+    class User < ActiveRecord::Base
+       
+      extend SimpleStateMachine::Mountable
+      self.state_machine_definition = MyStateMachine.new self
+
+      def after_initialize
+        self.ssm_state ||= 'new'
+      end
+      
+      def invite
+        self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
+      end
+      
+      def confirm_invitation activation_code
+        if self.activation_code != activation_code
+          errors.add 'activation_code', 'is invalid'
+        end
+      end
+    end
+
+
+== Generating graphiz visualizations
+
+If your using rails you get tasks for generating a graphiz google chart
+
 
 
 This code was just released, we do not claim it to be stable.
