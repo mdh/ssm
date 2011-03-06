@@ -168,9 +168,6 @@ You can define your state machine in a seperate class:
 If your using rails you get tasks for generating a graphiz google chart
 
 
-
-This code was just released, we do not claim it to be stable.
-
 == Note on Patches/Pull Requests
  
 * Fork the project.
