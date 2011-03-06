@@ -4,6 +4,7 @@ A simple DSL to decorate existing methods with state transition guards.
 
 Instead of using a DSL to define events, SimpleStateMachine decorates methods 
 to help you encapsulate state and guard state transitions.
+
 It supports exception rescuing, graphiz visualization and mountable state_machines.
 
 == Example usage
