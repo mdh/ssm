@@ -164,10 +164,20 @@ describe ActiveRecord do
   end
 
   describe "event" do
-
-    it "raises an error" do
+    it "persists transitions" do
       user = User.create!(:name => 'name')
-      expect { user.invite }.to raise_error(RuntimeError, "You cannot call invite. Use invite! instead")
+      user.invite.should == true
+      User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
+    end
+
+    it "returns false, keeps state and keeps errors if event adds errors" do
+      user = User.create!(:name => 'name')
+      user.invite_and_save!
+      user.should be_invited
+      user.confirm_invitation('x').should == false
+      user.should be_invited
+      user.errors.entries.should == [['activation_code', 'is invalid']]
     end
 
   end
