@@ -7,27 +7,53 @@ to help you encapsulate state and guard state transitions.
 
 It supports exception rescuing, google chart visualization and mountable state_machines.
 
+== Basic example
+
+    class LampSwitch
+
+      extend SimpleStateMachine
+
+      def initialize
+        self.state = 'off'
+      end
+
+      def push_switch
+        puts "pushed switch"
+      end
+      event :push_switch, :off => :on,
+                          :on  => :off
+
+    end
+
+    lamp = LampSwitch.new
+    lamp.state          # => 'off'
+    lamp.off?           # => true
+    lamp.push_switch    # => 'pushed switch'
+    lamp.state          # => 'on'
+    lamp.on?            # => true
+    lamp.push_switch    # => 'pushed switch'
+    lamp.off?           # => true
+
+
 == Basic usage
 
-Write a method, arguments are allowed:
+Define your event as a method, arguments are allowed:
 
   def activate_account(activation_code)
     # call other methods, no need to add these in callbacks
-    ...
-    log.debug "Try to activate account with #{activation_code}"
+    ..
   end
 
 Now mark the method as an event and specify how the state should transition 
-when the method is called. In this example, the activate_account method will 
-set the state to :active if the initial state is :pending.
+when the method is called. If we want the state to change from :pending to :active we write:
 
   event :activate_account, :pending => :active
 
-That's it! 
-You can now call `activate_account` and the state will automatically change.
-If the state change is not allowed, a SimpleStateMachine::Error is raised.
+That's it!
+You can now call activate_account and the state will automatically change.
+If the state change is not allowed, a SimpleStateMachine::IllegalStateTransitionError is raised.
 
-=== Example usage with ActiveRecord / ActiveModel
+=== Using ActiveRecord / ActiveModel validations
 When using ActiveRecord / ActiveModel you can add an error to the errors object.
 This will prevent the state from being changed.
   
@@ -56,42 +82,6 @@ If an event should transition from all states you can use :all
 
   event :suspend, :all => :suspended
 
-
-== More complete implementation
-
-To add a state machine:
-- extend SimpleStateMachine
-- set the initial state
-- turn methods into events
-
-    class LampWithHotelSwitch
-
-      extend SimpleStateMachine
-
-      def initialize
-        self.state = 'off'
-      end
-
-      def push_switch_1
-        puts "pushed switch 1 #{state}"
-      end
-      event :push_switch_1, :off => :on,
-                            :on  => :off
-
-      # define another event
-      # note that implementation of :push_switch_2 is optional
-      event :push_switch_2, :off => :on,
-                            :on  => :off
-
-    end
-
-    lamp = LampWithHotelSwitch.new
-    lamp.state          # => 'off'
-    lamp.push_switch_1
-    lamp.state          # => 'on'
-    lamp.push_siwtch_2
-    lamp.state          # => 'off'
-
 == ActiveRecord Example
 
 To add a state machine with ActiveRecord persistence:
@@ -104,17 +94,17 @@ To add a state machine with ActiveRecord persistence:
       extend SimpleStateMachine::ActiveRecord
 
       def after_initialize
-        self.ssm_state ||= 'new'
+        self.ssm_state ||= 'pending'
         # if you get an ActiveRecord::MissingAttributeError
         # you'll probably need to do (http://bit.ly/35q23b):
-        #   write_attribute(:ssm_state, "new") unless read_attribute(:ssm_state)
+        #   write_attribute(:ssm_state, "pending") unless read_attribute(:ssm_state)
       end
       
       def invite
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
         #send_activation_email
       end
-      event :invite, :new => :invited
+      event :invite, :pending => :invited
       
       def confirm_invitation activation_code
         if self.activation_code != activation_code
@@ -127,16 +117,16 @@ To add a state machine with ActiveRecord persistence:
 This generates the following event methods
 - invite!
 - confirm_invitation!
-- suspend!
+
 And the following methods to query the state:
+- pending?
 - invited?
 - active?
-- suspended?
 
 If you want to be more verbose you can also use:
 - invite_and_save  (behave like ActiveRecord save)
 - invite_and_save! (is equal to invite! and behaves like save!)
-
+§
 
 == Mountable Example
 
