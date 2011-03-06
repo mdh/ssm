@@ -53,25 +53,32 @@ To add a state machine:
 - turn methods into events
 
     class LampWithHotelSwitch
-      
+
       extend SimpleStateMachine
-      
+
       def initialize
-        self.state = :off
+        self.state = 'off'
       end
-      
+
       def push_switch_1
-        puts 'pushed switch 1 #{state}'
+        puts "pushed switch 1 #{state}"
       end
       event :push_switch_1, :off => :on,
                             :on  => :off
-      
+
       # define another event
       # note that implementation of :push_switch_2 is optional
       event :push_switch_2, :off => :on,
                             :on  => :off
-      
+
     end
+
+    lamp = LampWithHotelSwitch.new
+    lamp.state          # => 'off'
+    lamp.push_switch_1
+    lamp.state          # => 'on'
+    lamp.push_siwtch_2
+    lamp.state          # => 'off'
 
 == ActiveRecord Example
 
@@ -83,8 +90,6 @@ To add a state machine with ActiveRecord persistence:
     class User < ActiveRecord::Base
        
       extend SimpleStateMachine::ActiveRecord
-      # define a custum state_method (state is default)
-      state_machine_definition.state_method = :ssm_state
 
       def after_initialize
         self.ssm_state ||= 'new'
@@ -110,11 +115,18 @@ To add a state machine with ActiveRecord persistence:
       event :suspend, :all => :suspended
     end
 
-This generates the following methods
-- {event}_and_save  works like save
-- {event}_and_save! works like save!
-- {event}!          works the same as {event}_and_save! 
-- {state}?          whether or not the current state is {state}
+This generates the following event methods
+- invite!
+- confirm_invitation!
+- suspend!
+And the following methods to query the state:
+- invited?
+- active?
+- suspended?
+
+If you want to be more verbose you can also use:
+- invite_and_save  (behave like ActiveRecord save)
+- invite_and_save! (is equal to invite! and behaves like save!)
 
 
 This code was just released, we do not claim it to be stable.
