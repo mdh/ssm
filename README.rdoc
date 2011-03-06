@@ -115,9 +115,10 @@ To add a state machine with ActiveRecord persistence:
     end
 
 This generates the following event methods
-- invite
-- invite!
-- confirm_invitation!
+- invite              (behaves like ActiveRecord save )
+- invite!             (behaves like ActiveRecord save!)
+- confirm_invitation  (behaves like ActiveRecord save )
+- confirm_invitation! (behaves like ActiveRecord save!)
 
 And the following methods to query the state:
 - pending?
@@ -125,8 +126,8 @@ And the following methods to query the state:
 - active?
 
 If you want to be more verbose you can also use:
-- invite_and_save  (is equal to invite  and behaves like ActiveRecord save)
-- invite_and_save! (is equal to invite! and behaves like save!)
+- invite_and_save  (alias for invite)
+- invite_and_save! (alias for invite!)
 
 == Mountable Example
 
