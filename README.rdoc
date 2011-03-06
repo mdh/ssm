@@ -5,9 +5,9 @@ A simple DSL to decorate existing methods with state transition guards.
 Instead of using a DSL to define events, SimpleStateMachine decorates methods 
 to help you encapsulate state and guard state transitions.
 
-It supports exception rescuing, graphiz visualization and mountable state_machines.
+It supports exception rescuing, google chart visualization and mountable state_machines.
 
-== Example usage
+== Basic usage
 
 Write a method, arguments are allowed:
 
@@ -155,9 +155,9 @@ You can define your state machine in a seperate class:
     end
 
 
-== Generating graphiz visualizations
+== Generating google chart visualizations
 
-If your using rails you get tasks for generating a graphiz google chart
+If your using rails you get rake tasks for generating a graphiz google chart of the state machine.
 
 
 == Note on Patches/Pull Requests
