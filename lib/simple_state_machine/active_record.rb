@@ -17,7 +17,7 @@ module SimpleStateMachine::ActiveRecord
       unless @subject.method_defined?(event_name_and_save)
         @subject.send(:define_method, event_name_and_save) do |*args|
           old_state = self.send(self.class.state_machine_definition.state_method)
-          send event_name, *args
+          send "with_managed_state_#{event_name}", *args
           if !self.errors.entries.empty?
             self.send("#{self.class.state_machine_definition.state_method}=", old_state)
             return false
@@ -35,7 +35,7 @@ module SimpleStateMachine::ActiveRecord
       unless @subject.method_defined?(event_name_and_save_bang)
         @subject.send(:define_method, event_name_and_save_bang) do |*args|
           old_state = self.send(self.class.state_machine_definition.state_method)
-          send event_name, *args
+          send "with_managed_state_#{event_name}", *args
           if !self.errors.entries.empty?
             self.send("#{self.class.state_machine_definition.state_method}=", old_state)
             raise ActiveRecord::RecordInvalid.new(self)
@@ -47,18 +47,26 @@ module SimpleStateMachine::ActiveRecord
             raise #re raise
           end
         end
-        @subject.send :alias_method, "#{transition.event_name}!", event_name_and_save_bang 
+        @subject.send :alias_method, "#{transition.event_name}!", event_name_and_save_bang
       end
     end
-  
-    private
 
-    def define_state_setter_method; end
+    protected
 
-    def define_state_getter_method; end
+      def alias_event_methods event_name
+        @subject.send(:define_method, "cannot_call_#{event_name}") do |*args|
+          raise "You cannot call #{event_name}. Use #{event_name}! instead"
+        end
+        @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
+        @subject.send :alias_method, event_name, "cannot_call_#{event_name}"
+      end
+
+      def define_state_setter_method; end
+
+      def define_state_getter_method; end
 
   end
-  
+
   def state_machine_definition
     unless @state_machine_definition
       @state_machine_definition = SimpleStateMachine::StateMachineDefinition.new

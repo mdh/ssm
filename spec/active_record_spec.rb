@@ -12,7 +12,7 @@ ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
                                         :database => ":memory:")
 
 def setup_db
-  ActiveRecord::Schema.define(:version => 1) do    
+  ActiveRecord::Schema.define(:version => 1) do
     create_table :users do |t|
       t.column :id,               :integer
       t.column :name,             :string
@@ -38,7 +38,7 @@ class Ticket < ActiveRecord::Base
   extend SimpleStateMachine::ActiveRecord
 
   state_machine_definition.state_method = :ssm_state
- 
+
   def after_initialize
     self.ssm_state ||= 'open'
   end
@@ -47,21 +47,21 @@ class Ticket < ActiveRecord::Base
 end
 
 describe ActiveRecord do
-  
+
   before do
     setup_db
   end
-  
+
   after do
     teardown_db
   end
-  
+
   it "has a default state" do
     User.new.should be_new
   end
-  
+
   # TODO needs nesting/grouping, seems to have some duplication
- 
+
   describe "event_and_save" do
     it "persists transitions" do
       user = User.create!(:name => 'name')
@@ -88,9 +88,9 @@ describe ActiveRecord do
 
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
-      expect { 
-        user.confirm_invitation_and_save 'abc' 
-      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError, 
+      expect {
+        user.confirm_invitation_and_save 'abc'
+      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError,
                        "You cannot 'confirm_invitation' when state is 'new'")
     end
 
@@ -133,9 +133,9 @@ describe ActiveRecord do
 
     it "raises an error if an invalid state_transition is called" do
       user = User.create!(:name => 'name')
-      expect { 
-        user.confirm_invitation_and_save! 'abc' 
-      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError, 
+      expect {
+        user.confirm_invitation_and_save! 'abc'
+      }.to raise_error(SimpleStateMachine::IllegalStateTransitionError,
                        "You cannot 'confirm_invitation' when state is 'new'")
     end
 
@@ -143,9 +143,9 @@ describe ActiveRecord do
       user = User.new
       user.should be_new
       user.should_not be_valid
-      expect { 
-        user.invite_and_save! 
-      }.to raise_error(ActiveRecord::RecordInvalid, 
+      expect {
+        user.invite_and_save!
+      }.to raise_error(ActiveRecord::RecordInvalid,
                        "Validation failed: Name can't be blank")
       user.should be_new
     end
@@ -154,9 +154,9 @@ describe ActiveRecord do
       user = User.create!(:name => 'name')
       user.invite_and_save!
       user.should be_invited
-      expect { 
-        user.confirm_invitation_and_save!('x') 
-      }.to raise_error(ActiveRecord::RecordInvalid, 
+      expect {
+        user.confirm_invitation_and_save!('x')
+      }.to raise_error(ActiveRecord::RecordInvalid,
                        "Validation failed: Activation code is invalid")
       user.should be_invited
     end
@@ -165,19 +165,9 @@ describe ActiveRecord do
 
   describe "event" do
 
-    it "does not persist transitions" do
+    it "raises an error" do
       user = User.create!(:name => 'name')
-      user.invite.should == true
-      User.find(user.id).should_not be_invited
-      User.find(user.id).activation_code.should be_nil
-    end
-
-    it "returns false and keeps state if record is invalid" do    
-      user = User.new
-      user.should be_new
-      user.should_not be_valid
-      user.invite.should == false
-      user.should be_new
+      expect { user.invite }.to raise_error(RuntimeError, "You cannot call invite. Use invite! instead")
     end
 
   end
@@ -202,11 +192,11 @@ describe ActiveRecord do
   end
 
   describe 'custom state method' do
-    
+
     it "persists transitions" do
       ticket = Ticket.create!
       ticket.should be_open
-      ticket.close.should == true
+      ticket.close!.should == true
       ticket.should be_closed
     end
 

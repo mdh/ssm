@@ -126,7 +126,6 @@ And the following methods to query the state:
 If you want to be more verbose you can also use:
 - invite_and_save  (behave like ActiveRecord save)
 - invite_and_save! (is equal to invite! and behaves like save!)
-§
 
 == Mountable Example
 
