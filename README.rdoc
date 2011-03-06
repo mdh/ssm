@@ -75,7 +75,7 @@ You can rescue exceptions and specify the failure state
         Service::ConnectionError => :download_failed
 
   download_data! # catches Service::ConnectionError
-  state # => "download_failed"
+  state          # => "download_failed"
 
 === Catching all from states
 If an event should transition from all states you can use :all
