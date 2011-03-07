@@ -95,14 +95,10 @@ To add a state machine with ActiveRecord persistence:
 
       def after_initialize
         self.ssm_state ||= 'pending'
-        # if you get an ActiveRecord::MissingAttributeError
-        # you'll probably need to do (http://bit.ly/35q23b):
-        #   write_attribute(:ssm_state, "pending") unless read_attribute(:ssm_state)
-      end
+       end
       
       def invite
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
-        #send_activation_email
       end
       event :invite, :pending => :invited
       
