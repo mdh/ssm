@@ -4,7 +4,7 @@ require 'rails'
 module SimpleStateMachine
   class Railtie < Rails::Railtie
     rake_tasks do
-      load "tasks/graphiz.rake"
+      load "tasks/graphviz.rake"
     end
   end
 end

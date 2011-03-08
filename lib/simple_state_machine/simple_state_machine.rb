@@ -83,15 +83,15 @@ module SimpleStateMachine
       transitions.map(&:to_s).join("\n")
     end
 
-    # Graphiz dot format for rendering as a directional graph
-    def to_graphiz_dot
-      transitions.map { |t| t.to_graphiz_dot }.join(";")
+    # Graphviz dot format for rendering as a directional graph
+    def to_graphviz_dot
+      transitions.map { |t| t.to_graphviz_dot }.join(";")
     end
 
     # Generates a url that renders states and events as a directional graph.
     # See http://code.google.com/apis/chart/docs/gallery/graphviz.html
     def google_chart_url
-      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphiz_dot}}"
+      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
     end
   end
 
@@ -191,7 +191,7 @@ module SimpleStateMachine
       "#{from}.#{event_name}! => #{to}"
     end
 
-    def to_graphiz_dot
+    def to_graphviz_dot
       %("#{from}"->"#{to}"[label=#{event_name}])
     end
 

@@ -151,7 +151,7 @@ You can define your state machine in a seperate class:
 
 == Generating google chart visualizations
 
-If your using rails you get rake tasks for generating a graphiz google chart of the state machine.
+If your using rails you get rake tasks for generating a graphviz google chart of the state machine.
 
 
 == Note on Patches/Pull Requests
