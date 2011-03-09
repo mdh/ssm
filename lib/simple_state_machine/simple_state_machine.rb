@@ -31,11 +31,7 @@ module SimpleStateMachine
 
     # mark the method as an event and specify how the state should transition 
     def event event_name, state_transitions
-      state_transitions.each do |froms, to|
-        [froms].flatten.each do |from|
-          state_machine_definition.add_transition(event_name, from, to)
-        end
-      end
+      state_machine_definition.define_event event_name, state_transitions
     end
 
   end
@@ -67,16 +63,24 @@ module SimpleStateMachine
     def transitions
       @transitions ||= []
     end
-    
+
+    def define_event event_name, state_transitions
+      state_transitions.each do |froms, to|
+        [froms].flatten.each do |from|
+          add_transition(event_name, from, to)
+        end
+      end
+    end
+
     def add_transition event_name, from, to
       transition = Transition.new(event_name, from, to)
       transitions << transition
       decorator.decorate(transition)
     end
-     
+
     def state_method
       @state_method ||= :state
-    end      
+    end
 
     # Human readable format: old_state.event! => new_state 
     def to_s

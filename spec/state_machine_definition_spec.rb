@@ -65,9 +65,9 @@ describe SimpleStateMachine::StateMachineDefinition do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def initialize(subject)
           self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-          add_transition(:event_a, :state1, :state2)
-          add_transition(:event_b, :state2, :state3)
-          add_transition(:event_c, :state1, :state3)
+          define_event(:event_a, :state1 => :state2)
+          define_event(:event_b, :state2 => :state3)
+          define_event(:event_c, :state1 => :state3)
         end
       end
     end
@@ -82,9 +82,9 @@ describe SimpleStateMachine::StateMachineDefinition do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def initialize(subject)
           self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-          add_transition(:event_a, :state1, :state2)
-          add_transition(:event_b, :state2, :state3)
-          add_transition(:event_c, :state1, :state3)
+          define_event(:event_a, :state1 => :state2)
+          define_event(:event_b, :state2 => :state3)
+          define_event(:event_c, :state1 => :state3)
         end
       end
     end
