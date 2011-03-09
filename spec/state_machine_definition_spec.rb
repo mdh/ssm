@@ -53,11 +53,28 @@ describe SimpleStateMachine::StateMachineDefinition do
       subject.event2
       subject.should be_state3
     end
-    
+
     it "raise an error if an invalid state_transition is called" do
       lambda { subject.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
 
+  end
+
+  describe "#begin_states" do
+    before do
+      @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
+        def initialize(subject)
+          self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+          add_transition(:event1, :begin_state1, :state2)
+          add_transition(:event2, :state2, :end_state1)
+          add_transition(:event3, :begin_state2, :state2)
+        end
+      end
+    end
+
+    it "returns all begin states" do
+      @klass.begin_states.should == [:begin_state1, :begin_state2]
+    end
   end
 
   describe "#transitions" do

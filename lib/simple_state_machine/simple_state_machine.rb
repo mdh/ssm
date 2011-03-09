@@ -93,6 +93,21 @@ module SimpleStateMachine
     def google_chart_url
       "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphiz_dot}}"
     end
+
+    def self.begin_states
+      self_class = self
+      subject_class = Class.new do
+        extend SimpleStateMachine::Mountable
+        self.state_machine_definition = self_class.new self
+      end
+      from_states = []
+      to_states   = []
+      new(subject_class).transitions.map do |t|
+        from_states << t.from.to_sym
+        to_states   << t.to.to_sym
+      end
+      from_states - to_states
+    end
   end
   
   ##
