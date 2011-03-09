@@ -95,19 +95,35 @@ module SimpleStateMachine
     end
 
     def self.begin_states
-      self_class = self
-      subject_class = Class.new do
-        extend SimpleStateMachine::Mountable
-        self.state_machine_definition = self_class.new self
-      end
-      from_states = []
-      to_states   = []
-      new(subject_class).transitions.map do |t|
-        from_states << t.from.to_sym
-        to_states   << t.to.to_sym
-      end
       from_states - to_states
     end
+
+    def self.end_states
+      to_states - from_states
+    end
+
+    private
+
+      def self.from_states
+        sample_subject.transitions.map do |t|
+          t.from.to_sym
+        end
+      end
+
+      def self.to_states
+        sample_subject.transitions.map do |t|
+          t.to.to_sym
+        end
+      end
+
+      def self.sample_subject
+        self_class = self
+        subject_class = Class.new do
+          extend SimpleStateMachine::Mountable
+          self.state_machine_definition = self_class.new self
+        end
+        new(subject_class)
+      end
   end
   
   ##
