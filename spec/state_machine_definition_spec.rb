@@ -65,15 +65,15 @@ describe SimpleStateMachine::StateMachineDefinition do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def initialize(subject)
           self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-          add_transition(:event1, :begin_state1, :state2)
-          add_transition(:event2, :state2,       :end_state1)
-          add_transition(:event3, :begin_state2, :state2)
+          add_transition(:event_a, :state1, :state2)
+          add_transition(:event_b, :state2, :state3)
+          add_transition(:event_c, :state1, :state3)
         end
       end
     end
 
     it "returns all 'from' states that aren't 'to' states" do
-      @klass.begin_states.should == [:begin_state1, :begin_state2]
+      @klass.begin_states.should == [:state1]
     end
   end
 
@@ -82,15 +82,15 @@ describe SimpleStateMachine::StateMachineDefinition do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def initialize(subject)
           self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-          add_transition(:event1, :begin_state1, :state2)
-          add_transition(:event2, :state2,       :end_state1)
-          add_transition(:event3, :begin_state2, :end_state2)
+          add_transition(:event_a, :state1, :state2)
+          add_transition(:event_b, :state2, :state3)
+          add_transition(:event_c, :state1, :state3)
         end
       end
     end
 
     it "returns all 'to' states that aren't 'from' states" do
-      @klass.end_states.should == [:end_state1, :end_state2]
+      @klass.end_states.should == [:state3]
     end
   end
 

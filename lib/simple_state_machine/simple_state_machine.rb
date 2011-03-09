@@ -107,13 +107,13 @@ module SimpleStateMachine
       def self.from_states
         sample_subject.transitions.map do |t|
           t.from.to_sym
-        end
+        end.uniq
       end
 
       def self.to_states
         sample_subject.transitions.map do |t|
           t.to.to_sym
-        end
+        end.uniq
       end
 
       def self.sample_subject
