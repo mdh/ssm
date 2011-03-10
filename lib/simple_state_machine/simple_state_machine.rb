@@ -77,10 +77,10 @@ module SimpleStateMachine
       transitions << transition
       decorator.decorate(transition)
     end
-
+     
     def state_method
       @state_method ||= :state
-    end
+    end      
 
     # Human readable format: old_state.event! => new_state 
     def to_s
