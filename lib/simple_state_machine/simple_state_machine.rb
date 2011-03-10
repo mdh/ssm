@@ -1,7 +1,7 @@
 module SimpleStateMachine
 
   require 'cgi'
-  
+
   class IllegalStateTransitionError < ::RuntimeError
   end
 
@@ -26,10 +26,10 @@ module SimpleStateMachine
   include Mountable
 
   ##
-  # Adds state machine methods to the extended class 
+  # Adds state machine methods to the extended class
   module Extendable
 
-    # mark the method as an event and specify how the state should transition 
+    # mark the method as an event and specify how the state should transition
     def event event_name, state_transitions
       state_machine_definition.define_event event_name, state_transitions
     end
@@ -49,7 +49,7 @@ module SimpleStateMachine
     end
   end
   include Inheritable
-  
+
   ##
   # Defines state machine transitions
   class StateMachineDefinition
@@ -77,25 +77,25 @@ module SimpleStateMachine
       transitions << transition
       decorator.decorate(transition)
     end
-     
+
     def state_method
       @state_method ||= :state
-    end      
+    end
 
-    # Human readable format: old_state.event! => new_state 
+    # Human readable format: old_state.event! => new_state
     def to_s
       transitions.map(&:to_s).join("\n")
     end
 
-    # Graphiz dot format for rendering as a directional graph
-    def to_graphiz_dot
-      transitions.map { |t| t.to_graphiz_dot }.join(";")
+    # Graphviz dot format for rendering as a directional graph
+    def to_graphviz_dot
+      transitions.map { |t| t.to_graphviz_dot }.join(";")
     end
 
     # Generates a url that renders states and events as a directional graph.
     # See http://code.google.com/apis/chart/docs/gallery/graphviz.html
     def google_chart_url
-      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphiz_dot}}"
+      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
     end
 
     def self.begin_states
@@ -129,7 +129,7 @@ module SimpleStateMachine
         new(subject_class)
       end
   end
-  
+
   ##
   # Defines the state machine used by the instance
   class StateMachine
@@ -180,9 +180,9 @@ module SimpleStateMachine
         illegal_event_callback event_name
       end
     end
-  
+
     private
-      
+
       def state_machine_definition
         @subject.class.state_machine_definition
       end
@@ -199,12 +199,12 @@ module SimpleStateMachine
       def illegal_event_callback event_name
         raise IllegalStateTransitionError.new("You cannot '#{event_name}' when state is '#{@subject.send(state_method)}'")
       end
-  
+
   end
 
   ##
   # Defines transitions for events
-  class Transition 
+  class Transition
     attr_reader :event_name, :from, :to
     def initialize(event_name, from, to)
       @event_name = event_name.to_s
@@ -226,10 +226,10 @@ module SimpleStateMachine
       "#{from}.#{event_name}! => #{to}"
     end
 
-    def to_graphiz_dot
+    def to_graphviz_dot
       %("#{from}"->"#{to}"[label=#{event_name}])
     end
-      
+
 
     private
 
@@ -291,8 +291,7 @@ module SimpleStateMachine
               send("without_managed_state_#{event_name}", *args)
             end
           end
-          @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
-          @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
+          alias_event_methods event_name
         end
       end
 
@@ -309,7 +308,7 @@ module SimpleStateMachine
           @subject.send(:attr_reader, state_method)
         end
       end
-      
+
       def any_method_defined?(method)
         @subject.method_defined?(method) ||
         @subject.protected_method_defined?(method) ||
@@ -317,6 +316,11 @@ module SimpleStateMachine
       end
 
     protected
+
+      def alias_event_methods event_name
+        @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
+        @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
+      end
 
       def state_method
         @subject.state_machine_definition.state_method

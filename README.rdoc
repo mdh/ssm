@@ -5,28 +5,55 @@ A simple DSL to decorate existing methods with state transition guards.
 Instead of using a DSL to define events, SimpleStateMachine decorates methods 
 to help you encapsulate state and guard state transitions.
 
-== Example usage
+It supports exception rescuing, google chart visualization and mountable state_machines.
 
-Write a method, arguments are allowed:
+== Basic example
+
+    class LampSwitch
+
+      extend SimpleStateMachine
+
+      def initialize
+        self.state = 'off'
+      end
+
+      def push_switch
+        puts "pushed switch"
+      end
+      event :push_switch, :off => :on,
+                          :on  => :off
+
+    end
+
+    lamp = LampSwitch.new
+    lamp.state          # => 'off'
+    lamp.off?           # => true
+    lamp.push_switch    # => 'pushed switch'
+    lamp.state          # => 'on'
+    lamp.on?            # => true
+    lamp.push_switch    # => 'pushed switch'
+    lamp.off?           # => true
+
+
+== Basic usage
+
+Define your event as a method, arguments are allowed:
 
   def activate_account(activation_code)
     # call other methods, no need to add these in callbacks
-    ...
-    log.debug "Try to activate account with #{activation_code}"
+    ..
   end
 
 Now mark the method as an event and specify how the state should transition 
-when the method is called. In this example, the activate_account method will 
-set the state to :active if the initial state is :pending.
+when the method is called. If we want the state to change from :pending to :active we write:
 
   event :activate_account, :pending => :active
 
+That's it!
+You can now call activate_account and the state will automatically change.
+If the state change is not allowed, a SimpleStateMachine::IllegalStateTransitionError is raised.
 
-That's it! 
-You can now call the method and the state will automatically change.
-If the state change is not allowed, a SimpleStateMachine::Error is raised.
-
-=== Example usage with ActiveRecord / ActiveModel
+=== Using ActiveRecord / ActiveModel validations
 When using ActiveRecord / ActiveModel you can add an error to the errors object.
 This will prevent the state from being changed.
   
@@ -36,7 +63,9 @@ This will prevent the state from being changed.
     end
   end
 
-=== Example usage with exceptions
+  activate_account!("INVALID_CODE") # => ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
+
+=== Catching exceptions
 You can rescue exceptions and specify the failure state
 
   def download_data
@@ -45,33 +74,13 @@ You can rescue exceptions and specify the failure state
   event :download_data, :pending => :downloaded,
         Service::ConnectionError => :download_failed
 
-== More complete implementation
+  download_data # catches Service::ConnectionError
+  state         # => "download_failed"
 
-To add a state machine:
-- extend SimpleStateMachine
-- set the initial state
-- turn methods into events
+=== Catching all from states
+If an event should transition from all states you can use :all
 
-    class LampWithHotelSwitch
-      
-      extend SimpleStateMachine
-      
-      def initialize
-        self.state = :off
-      end
-      
-      def push_switch_1
-        puts 'pushed switch 1 #{state}'
-      end
-      event :push_switch_1, :off => :on,
-                            :on  => :off
-      
-      # define another event
-      # note that implementation of :push_switch_2 is optional
-      event :push_switch_2, :off => :on,
-                            :on  => :off
-      
-    end
+  event :suspend, :all => :suspended
 
 == ActiveRecord Example
 
@@ -83,21 +92,15 @@ To add a state machine with ActiveRecord persistence:
     class User < ActiveRecord::Base
        
       extend SimpleStateMachine::ActiveRecord
-      # define a custum state_method (state is default)
-      state_machine_definition.state_method = :ssm_state
 
       def after_initialize
-        self.ssm_state ||= 'new'
-        # if you get an ActiveRecord::MissingAttributeError
-        # you'll probably need to do (http://bit.ly/35q23b):
-        #   write_attribute(:ssm_state, "new") unless read_attribute(:ssm_state)
-      end
+        self.ssm_state ||= 'pending'
+       end
       
       def invite
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
-        #send_activation_email
       end
-      event :invite, :new => :invited
+      event :invite, :pending => :invited
       
       def confirm_invitation activation_code
         if self.activation_code != activation_code
@@ -105,19 +108,51 @@ To add a state machine with ActiveRecord persistence:
         end
       end
       event :confirm_invitation, :invited => :active
-      
-      # :all can be used to catch all from states
-      event :suspend, :all => :suspended
     end
 
-This generates the following methods
-- {event}_and_save  works like save
-- {event}_and_save! works like save!
-- {event}!          works the same as {event}_and_save! 
-- {state}?          whether or not the current state is {state}
+This generates the following event methods
+- invite              (behaves like ActiveRecord save )
+- invite!             (behaves like ActiveRecord save!)
+- confirm_invitation  (behaves like ActiveRecord save )
+- confirm_invitation! (behaves like ActiveRecord save!)
+
+And the following methods to query the state:
+- pending?
+- invited?
+- active?
+
+If you want to be more verbose you can also use:
+- invite_and_save  (alias for invite)
+- invite_and_save! (alias for invite!)
+
+== Mountable Example
+
+You can define your state machine in a seperate class:
+
+    class MyStateMachine < SimpleStateMachine::StateMachineDefinition
+      def initialize(subject)
+        self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+        add_transition(:invite, :new, :invited)
+        add_transition(:confirm_invitation, :invited, :active)
+      end
+    end
+
+    class User < ActiveRecord::Base
+       
+      extend SimpleStateMachine::Mountable
+      self.state_machine_definition = MyStateMachine.new self
+
+      def after_initialize
+        self.ssm_state ||= 'new'
+      end
+      
+    end
 
 
-This code was just released, we do not claim it to be stable.
+== Generating google chart visualizations
+
+If your using rails you get rake tasks for generating a graphviz google chart of the state machine.
+
 
 == Note on Patches/Pull Requests
  
