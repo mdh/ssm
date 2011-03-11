@@ -138,31 +138,36 @@ If you want to be more verbose you can also use:
 
 == Mountable Example
 
-You can define your state machine in a seperate class:
+If you like to separate your state machine from your model, you can do so as following:
 
-    class MyStateMachine < SimpleStateMachine::StateMachineDefinition
-      def initialize(subject)
-        self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-        add_transition(:invite, :new, :invited)
-        add_transition(:confirm_invitation, :invited, :active)
-      end
+  class MyStateMachine < SimpleStateMachine::StateMachineDefinition
+
+    def initialize(subject)
+      self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+      add_transition(:invite, :new, :invited)
+      add_transition(:confirm_invitation, :invited, :active)
     end
 
-    class User < ActiveRecord::Base
+  end
 
-      extend SimpleStateMachine::Mountable
-      self.state_machine_definition = MyStateMachine.new self
+  class User < ActiveRecord::Base
 
-      def after_initialize
-        self.ssm_state ||= 'new'
-      end
+    extend SimpleStateMachine::Mountable
+    self.state_machine_definition = MyStateMachine.new self
 
+    def after_initialize
+      self.ssm_state ||= 'new'
     end
+
+  end
 
 
 == Generating google chart visualizations
 
-If your using rails you get rake tasks for generating a graphviz google chart of the state machine.
+If you are using Rails/ActiveRecord you can generate a graphviz chart of the state machine via rake.
+For details run:
+  
+  rake -T ssm
 
 
 == Note on Patches/Pull Requests
