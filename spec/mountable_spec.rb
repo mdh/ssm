@@ -10,7 +10,7 @@ describe "Mountable" do
     end
     klass = Class.new do
       extend SimpleStateMachine::Mountable
-      self.state_machine_definition = mountable_class.new self
+      mount_state_machine mountable_class
     end
     @instance = klass.new
     @instance.state = 'state1'

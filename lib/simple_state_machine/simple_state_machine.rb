@@ -22,6 +22,10 @@ module SimpleStateMachine
         state_machine_definition.decorator.decorate(transition)
       end
     end
+
+    def mount_state_machine mountable_class
+      self.state_machine_definition = mountable_class.new(self)
+    end
   end
   include Mountable
 
