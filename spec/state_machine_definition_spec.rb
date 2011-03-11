@@ -8,7 +8,7 @@ describe SimpleStateMachine::StateMachineDefinition do
       def initialize(state = 'state1')
         @state = state
       end
-      event :event1, :state1 => :state2, :state2 => :state3      
+      event :event1, :state1 => :state2, :state2 => :state3
     end
     @smd = @klass.state_machine_definition
   end
@@ -91,6 +91,23 @@ describe SimpleStateMachine::StateMachineDefinition do
 
     it "returns all 'to' states that aren't 'from' states" do
       @klass.end_states.should == [:state3]
+    end
+  end
+
+  describe ".states" do
+    before do
+      @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
+        def initialize(subject)
+          self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+          define_event(:event_a, :state1 => :state2)
+          define_event(:event_b, :state2 => :state3)
+          define_event(:event_c, :state1 => :state3)
+        end
+      end
+    end
+
+    it "returns all states" do
+      @klass.states.map(&:to_s).sort.should == %w{state1 state2 state3}
     end
   end
 

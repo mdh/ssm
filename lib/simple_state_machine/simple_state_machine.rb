@@ -106,6 +106,10 @@ module SimpleStateMachine
       to_states - from_states
     end
 
+    def self.states
+      (to_states + from_states).uniq
+    end
+
     private
 
       def self.from_states
