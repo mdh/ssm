@@ -116,18 +116,20 @@ If you like to separate your state machine from your model class, you can do so 
 
   class MyStateMachine < SimpleStateMachine::StateMachineDefinition
 
-    def initialize(subject)
-      self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-      add_transition(:invite, :new, :invited)
-      add_transition(:confirm_invitation, :invited, :active)
+    def add_events
+      define_event(:invite,             :new     => :invited)
+      define_event(:confirm_invitation, :invited => :active)
     end
 
+    def decorator_class
+      SimpleStateMachine::Decorator
+    end
   end
 
   class User < ActiveRecord::Base
 
     extend SimpleStateMachine::Mountable
-    self.state_machine_definition = MyStateMachine.new self
+    mount_state_machine MyStateMachine
 
     def after_initialize
       self.state ||= 'new'
