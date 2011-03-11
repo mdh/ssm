@@ -7,32 +7,43 @@ to help you encapsulate state and guard state transitions.
 
 It supports exception rescuing, google chart visualization and mountable state_machines.
 
+== Installation
+
+Use gem install:
+
+  gem install simple_state_machine
+
+Or add it to your Gemfile:
+
+  gem 'simple_state_machine'
+
+
 == Basic example
 
-    class LampSwitch
+  class LampSwitch
 
-      extend SimpleStateMachine
+     extend SimpleStateMachine
 
-      def initialize
-        self.state = 'off'
-      end
+     def initialize
+       self.state = 'off'
+     end
 
-      def push_switch
-        puts "pushed switch"
-      end
-      event :push_switch, :off => :on,
-                          :on  => :off
+     def push_switch
+       puts "pushed switch"
+     end
+     event :push_switch, :off => :on,
+                         :on  => :off
 
-    end
+  end
 
-    lamp = LampSwitch.new
-    lamp.state          # => 'off'
-    lamp.off?           # => true
-    lamp.push_switch    # => 'pushed switch'
-    lamp.state          # => 'on'
-    lamp.on?            # => true
-    lamp.push_switch    # => 'pushed switch'
-    lamp.off?           # => true
+  lamp = LampSwitch.new
+  lamp.state          # => 'off'
+  lamp.off?           # => true
+  lamp.push_switch    # => 'pushed switch'
+  lamp.state          # => 'on'
+  lamp.on?            # => true
+  lamp.push_switch    # => 'pushed switch'
+  lamp.off?           # => true
 
 
 == Basic usage
@@ -56,7 +67,7 @@ If the state change is not allowed, a SimpleStateMachine::IllegalStateTransition
 === Using ActiveRecord / ActiveModel validations
 When using ActiveRecord / ActiveModel you can add an error to the errors object.
 This will prevent the state from being changed.
-  
+
   def activate_account(activation_code)
     if activation_code_invalid?(activation_code)
       errors.add(:activation_code, 'Invalid')
@@ -90,18 +101,18 @@ To add a state machine with ActiveRecord persistence:
 - turn methods into events
 
     class User < ActiveRecord::Base
-       
+
       extend SimpleStateMachine::ActiveRecord
 
       def after_initialize
         self.ssm_state ||= 'pending'
        end
-      
+
       def invite
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
       end
       event :invite, :pending => :invited
-      
+
       def confirm_invitation activation_code
         if self.activation_code != activation_code
           errors.add 'activation_code', 'is invalid'
@@ -138,14 +149,14 @@ You can define your state machine in a seperate class:
     end
 
     class User < ActiveRecord::Base
-       
+
       extend SimpleStateMachine::Mountable
       self.state_machine_definition = MyStateMachine.new self
 
       def after_initialize
         self.ssm_state ||= 'new'
       end
-      
+
     end
 
 
@@ -155,7 +166,7 @@ If your using rails you get rake tasks for generating a graphviz google chart of
 
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
