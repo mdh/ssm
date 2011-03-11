@@ -1,13 +1,21 @@
 namespace :ssm do
   namespace :graph do
-    desc 'Generate a url for a google chart for class=[class]'
+    desc 'Generate a url for a google chart. You must specify class=ClassName'
     task :url => :environment do
-      puts ENV['class'].constantize.state_machine_definition.google_chart_url
+      if clazz = ENV['class']
+        puts clazz.constantize.state_machine_definition.google_chart_url
+      else
+        puts "Missing argument: class. Please specify class=ClassName"
+      end
     end
 
-    desc 'Opens the google chart in the browser for class=[class]'
+    desc 'Opens the google chart in your browser. You must specify class=ClassNAME'
     task :open => :environment do
-      `open '#{::CGI.unescape(ENV['class'].constantize.state_machine_definition.google_chart_url)}'`
+      if clazz = ENV['class']
+        `open '#{::CGI.unescape(clazz.constantize.state_machine_definition.google_chart_url)}'`
+      else
+        puts "Missing argument: class. Please specify class=ClassName"
+      end
     end
   end
 end
