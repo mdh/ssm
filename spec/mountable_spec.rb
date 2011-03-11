@@ -5,12 +5,12 @@ describe "Mountable" do
     mountable_class = Class.new(SimpleStateMachine::StateMachineDefinition) do
       def initialize(subject)
         self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
-        add_transition(:event, :state1, :state2)
+        define_event(:event, :state1 => :state2)
       end
     end
     klass = Class.new do
       extend SimpleStateMachine::Mountable
-      self.state_machine_definition = mountable_class.new self
+      mount_state_machine mountable_class
     end
     @instance = klass.new
     @instance.state = 'state1'
