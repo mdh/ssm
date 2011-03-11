@@ -2,7 +2,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 require 'cgi'
 
 describe SimpleStateMachine do
- 
+
   it "has an error that extends RuntimeError" do
     SimpleStateMachine::IllegalStateTransitionError.superclass.should == RuntimeError
   end
@@ -31,7 +31,7 @@ describe SimpleStateMachine do
       example.should be_state3
     end
 
-    it "changes state if event has multiple froms" do
+    it "changes state if event has multiple from states" do
       klass = Class.new(@klass)
       klass.instance_eval do
         event :event, [:state1, :state2] => :state3
@@ -45,7 +45,7 @@ describe SimpleStateMachine do
       example.should be_state3
     end
 
-    it "changes state if event has all as from" do
+    it "changes state if event has :all as from state" do
       klass = Class.new(@klass)
       klass.instance_eval do
         event :other_event, :state1 => :state2
@@ -64,7 +64,7 @@ describe SimpleStateMachine do
       klass = Class.new(@klass)
       klass.instance_eval do
         event :event, :state1 => :state2
-      end  
+      end
       example = klass.new :state1
       example.state.should == :state1
       example.send(:event)
@@ -84,13 +84,13 @@ describe SimpleStateMachine do
       example.raise_error
       example.should be_failed
     end
-    
+
     it "raises an error if an invalid state_transition is called" do
       klass = Class.new(@klass)
       klass.instance_eval do
         event :event,  :state1 => :state2
         event :event2, :state2 => :state3
-      end  
+      end
       example = klass.new
       lambda { example.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
@@ -103,7 +103,7 @@ describe SimpleStateMachine do
           'event2'
         end
         event :event2, :state2 => :state3
-      end  
+      end
       example = klass.new
       example.event1.should == nil
       example.event2.should == 'event2'
@@ -117,7 +117,7 @@ describe SimpleStateMachine do
           @event_called = true
         end
         event :event, :state1 => :state2
-      end  
+      end
       example = klass.new
       example.event
       example.event_called.should == true
