@@ -63,11 +63,14 @@ describe SimpleStateMachine::StateMachineDefinition do
   describe ".begin_states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def initialize(subject)
-          self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+        def add_events
           define_event(:event_a, :state1 => :state2)
           define_event(:event_b, :state2 => :state3)
           define_event(:event_c, :state1 => :state3)
+        end
+
+        def decorator_class
+          SimpleStateMachine::Decorator
         end
       end
     end
@@ -80,12 +83,16 @@ describe SimpleStateMachine::StateMachineDefinition do
   describe ".end_states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def initialize(subject)
-          self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+        def add_events
           define_event(:event_a, :state1 => :state2)
           define_event(:event_b, :state2 => :state3)
           define_event(:event_c, :state1 => :state3)
         end
+
+        def decorator_class
+          SimpleStateMachine::Decorator
+        end
+
       end
     end
 
@@ -97,12 +104,16 @@ describe SimpleStateMachine::StateMachineDefinition do
   describe ".states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def initialize(subject)
-          self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+        def add_events
           define_event(:event_a, :state1 => :state2)
           define_event(:event_b, :state2 => :state3)
           define_event(:event_c, :state1 => :state3)
         end
+
+        def decorator_class
+          SimpleStateMachine::Decorator
+        end
+
       end
     end
 

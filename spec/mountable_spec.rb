@@ -3,9 +3,12 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Mountable" do
   before do
     mountable_class = Class.new(SimpleStateMachine::StateMachineDefinition) do
-      def initialize(subject)
-        self.lazy_decorator = lambda { SimpleStateMachine::Decorator.new(subject) }
+      def add_events
         define_event(:event, :state1 => :state2)
+      end
+
+      def decorator_class
+        SimpleStateMachine::Decorator
       end
     end
     klass = Class.new do

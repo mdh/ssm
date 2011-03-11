@@ -11,7 +11,7 @@ module SimpleStateMachine
     def state_machine_definition
       unless @state_machine_definition
         @state_machine_definition = StateMachineDefinition.new
-        @state_machine_definition.lazy_decorator = lambda { Decorator.new(self) }
+        @state_machine_definition.subject = self
       end
       @state_machine_definition
     end
@@ -24,7 +24,9 @@ module SimpleStateMachine
     end
 
     def mount_state_machine mountable_class
-      self.state_machine_definition = mountable_class.new(self)
+      self.state_machine_definition = mountable_class.new
+      self.state_machine_definition.subject = self
+      self.state_machine_definition.add_events
     end
   end
   include Mountable
@@ -58,10 +60,10 @@ module SimpleStateMachine
   # Defines state machine transitions
   class StateMachineDefinition
 
-    attr_writer :state_method, :decorator, :lazy_decorator
+    attr_writer :state_method, :subject, :decorator, :decorator_class
 
     def decorator
-      @decorator ||= @lazy_decorator.call
+      @decorator ||= decorator_class.new(@subject)
     end
 
     def transitions
@@ -114,6 +116,10 @@ module SimpleStateMachine
       (to_states + from_states).uniq
     end
 
+    def decorator_class
+      @decorator_class ||= Decorator
+    end
+
     private
 
       def self.from_states
@@ -130,11 +136,10 @@ module SimpleStateMachine
 
       def self.sample_subject
         self_class = self
-        subject_class = Class.new do
+        Class.new do
           extend SimpleStateMachine::Mountable
-          self.state_machine_definition = self_class.new self
-        end
-        new(subject_class)
+          mount_state_machine self_class
+        end.state_machine_definition
       end
   end
 
@@ -257,12 +262,16 @@ module SimpleStateMachine
     attr_writer :subject
     def initialize(subject)
       @subject = subject
-      define_state_machine_method
-      define_state_getter_method
-      define_state_setter_method
     end
 
     def decorate transition
+      unless @state_methods_defined
+        define_state_machine_method
+        define_state_getter_method
+        define_state_setter_method
+        @state_methods_defined = true
+      end
+
       define_state_helper_method(transition.from)
       define_state_helper_method(transition.to)
       define_event_method(transition.event_name)
