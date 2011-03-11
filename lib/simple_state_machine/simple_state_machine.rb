@@ -104,15 +104,15 @@ module SimpleStateMachine
       "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
     end
 
-    def self.begin_states
+    def begin_states
       from_states - to_states
     end
 
-    def self.end_states
+    def end_states
       to_states - from_states
     end
 
-    def self.states
+    def states
       (to_states + from_states).uniq
     end
 
@@ -122,28 +122,29 @@ module SimpleStateMachine
 
     private
 
-      def self.from_states
-        to_uniq_sym(transitions.map(&:from))
+      def from_states
+        to_uniq_sym(sample_transitions.map(&:from))
       end
 
-      def self.to_states
-        to_uniq_sym(transitions.map(&:to))
+      def to_states
+        to_uniq_sym(sample_transitions.map(&:to))
       end
 
-      def self.to_uniq_sym(array)
+      def to_uniq_sym(array)
         array.map(&:to_sym).uniq
       end
 
-      def self.transitions
-        sample_subject.transitions
+      def sample_transitions
+        (@subject || sample_subject).state_machine_definition.send :transitions
       end
 
-      def self.sample_subject
-        self_class = self
-        Class.new do
+      def sample_subject
+        self_class = self.class
+        sample = Class.new do
           extend SimpleStateMachine::Mountable
           mount_state_machine self_class
-        end.state_machine_definition
+        end
+        sample
       end
   end
 

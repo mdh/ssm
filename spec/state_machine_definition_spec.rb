@@ -60,7 +60,7 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   end
 
-  describe ".begin_states" do
+  describe "#begin_states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def add_events
@@ -76,11 +76,11 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "returns all 'from' states that aren't 'to' states" do
-      @klass.begin_states.should == [:state1]
+      @klass.new.begin_states.should == [:state1]
     end
   end
 
-  describe ".end_states" do
+  describe "#end_states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def add_events
@@ -97,11 +97,11 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "returns all 'to' states that aren't 'from' states" do
-      @klass.end_states.should == [:state3]
+      @klass.new.end_states.should == [:state3]
     end
   end
 
-  describe ".states" do
+  describe "#states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def add_events
@@ -118,7 +118,7 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "returns all states" do
-      @klass.states.map(&:to_s).sort.should == %w{state1 state2 state3}
+      @klass.new.states.map(&:to_s).sort.should == %w{state1 state2 state3}
     end
   end
 
