@@ -89,7 +89,7 @@ module SimpleStateMachine
 
     # Graphviz dot format for rendering as a directional graph
     def to_graphviz_dot
-      transitions.map { |t| t.to_graphviz_dot }.join(";")
+      transitions.map { |t| t.to_graphviz_dot }.sort.join(";")
     end
 
     # Generates a url that renders states and events as a directional graph.
