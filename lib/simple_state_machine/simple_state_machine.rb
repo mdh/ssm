@@ -117,15 +117,19 @@ module SimpleStateMachine
     private
 
       def self.from_states
-        sample_subject.transitions.map do |t|
-          t.from.to_sym
-        end.uniq
+        to_uniq_sym(transitions.map(&:from))
       end
 
       def self.to_states
-        sample_subject.transitions.map do |t|
-          t.to.to_sym
-        end.uniq
+        to_uniq_sym(transitions.map(&:to))
+      end
+
+      def self.to_uniq_sym(array)
+        array.map(&:to_sym).uniq
+      end
+
+      def self.transitions
+        sample_subject.transitions
       end
 
       def self.sample_subject
