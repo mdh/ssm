@@ -35,11 +35,7 @@ module SimpleStateMachine
 
     # mark the method as an event and specify how the state should transition
     def event event_name, state_transitions
-      state_transitions.each do |froms, to|
-        [froms].flatten.each do |from|
-          state_machine_definition.add_transition(event_name, from, to)
-        end
-      end
+      state_machine_definition.define_event event_name, state_transitions
     end
 
   end
@@ -72,6 +68,14 @@ module SimpleStateMachine
       @transitions ||= []
     end
 
+    def define_event event_name, state_transitions
+      state_transitions.each do |froms, to|
+        [froms].flatten.each do |from|
+          add_transition(event_name, from, to)
+        end
+      end
+    end
+
     def add_transition event_name, from, to
       transition = Transition.new(event_name, from, to)
       transitions << transition
@@ -89,7 +93,7 @@ module SimpleStateMachine
 
     # Graphviz dot format for rendering as a directional graph
     def to_graphviz_dot
-      transitions.map { |t| t.to_graphviz_dot }.join(";")
+      transitions.map { |t| t.to_graphviz_dot }.sort.join(";")
     end
 
     # Generates a url that renders states and events as a directional graph.
@@ -97,6 +101,41 @@ module SimpleStateMachine
     def google_chart_url
       "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
     end
+
+    def self.begin_states
+      from_states - to_states
+    end
+
+    def self.end_states
+      to_states - from_states
+    end
+
+    def self.states
+      (to_states + from_states).uniq
+    end
+
+    private
+
+      def self.from_states
+        sample_subject.transitions.map do |t|
+          t.from.to_sym
+        end.uniq
+      end
+
+      def self.to_states
+        sample_subject.transitions.map do |t|
+          t.to.to_sym
+        end.uniq
+      end
+
+      def self.sample_subject
+        self_class = self
+        subject_class = Class.new do
+          extend SimpleStateMachine::Mountable
+          self.state_machine_definition = self_class.new self
+        end
+        new(subject_class)
+      end
   end
 
   ##
