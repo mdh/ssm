@@ -10,8 +10,12 @@ describe "Mountable" do
       end
     end
     klass = Class.new do
+      attr_accessor :event_called
       extend SimpleStateMachine::Mountable
       mount_state_machine mountable_class
+      def without_managed_state_event
+        @event_called = true
+      end
     end
     @instance = klass.new
     @instance.state = 'state1'
@@ -22,4 +26,9 @@ describe "Mountable" do
     @instance.should_not be_state2
   end
 
+  it "calls existing methods" do
+    @instance.event
+    @instance.should be_state2
+    @instance.event_called.should == true
+  end
 end

@@ -296,12 +296,9 @@ module SimpleStateMachine
     end
 
     def decorate transition
-      unless @state_methods_defined
-        define_state_machine_method
-        define_state_getter_method
-        define_state_setter_method
-        @state_methods_defined = true
-      end
+      define_state_machine_method
+      define_state_getter_method
+      define_state_setter_method
 
       define_state_helper_method(transition.from)
       define_state_helper_method(transition.to)
@@ -312,8 +309,10 @@ module SimpleStateMachine
     private
 
       def define_state_machine_method
-        @subject.send(:define_method, "state_machine") do
-          @state_machine ||= StateMachine.new(self)
+        unless any_method_defined?("state_machine")
+          @subject.send(:define_method, "state_machine") do
+            @state_machine ||= StateMachine.new(self)
+          end
         end
       end
 

@@ -144,7 +144,6 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   describe "#google_chart_url" do
     it "shows the state and event dependencies as a Google chart" do
-      puts "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape @smd.to_graphviz_dot}}"
       @smd.google_chart_url.should == "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape @smd.to_graphviz_dot}}"
     end
   end
