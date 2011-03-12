@@ -120,6 +120,21 @@ module SimpleStateMachine
       @decorator_class ||= Decorator
     end
 
+    def add_events
+      self.class.events.each do |event_name, state_transitions|
+        define_event event_name, state_transitions
+      end
+    end
+
+    def self.event event_name, state_transitions
+      events << [event_name, state_transitions]
+    end
+
+    def self.events
+      @events ||= []
+    end
+
+
     private
 
       def from_states

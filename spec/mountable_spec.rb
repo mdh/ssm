@@ -3,9 +3,7 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 describe "Mountable" do
   before do
     mountable_class = Class.new(SimpleStateMachine::StateMachineDefinition) do
-      def add_events
-        define_event(:event, :state1 => :state2)
-      end
+      event(:event, :state1 => :state2)
 
       def decorator_class
         SimpleStateMachine::Decorator
