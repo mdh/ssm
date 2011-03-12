@@ -116,10 +116,8 @@ If you like to separate your state machine from your model class, you can do so 
 
   class MyStateMachine < SimpleStateMachine::StateMachineDefinition
 
-    def add_events
-      define_event(:invite,             :new     => :invited)
-      define_event(:confirm_invitation, :invited => :active)
-    end
+    event(:invite,             :new     => :invited)
+    event(:confirm_invitation, :invited => :active)
 
     def decorator_class
       SimpleStateMachine::Decorator
