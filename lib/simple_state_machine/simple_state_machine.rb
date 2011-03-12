@@ -66,6 +66,10 @@ module SimpleStateMachine
       @decorator ||= decorator_class.new(@subject)
     end
 
+    def decorator_class
+      @decorator_class ||= Decorator
+    end
+
     def transitions
       @transitions ||= []
     end
@@ -93,74 +97,82 @@ module SimpleStateMachine
       transitions.map(&:to_s).join("\n")
     end
 
-    # Graphviz dot format for rendering as a directional graph
-    def to_graphviz_dot
-      transitions.map { |t| t.to_graphviz_dot }.sort.join(";")
-    end
-
-    # Generates a url that renders states and events as a directional graph.
-    # See http://code.google.com/apis/chart/docs/gallery/graphviz.html
-    def google_chart_url
-      "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
-    end
-
-    def begin_states
-      from_states - to_states
-    end
-
-    def end_states
-      to_states - from_states
-    end
-
-    def states
-      (to_states + from_states).uniq
-    end
-
-    def decorator_class
-      @decorator_class ||= Decorator
-    end
-
-    def add_events
-      self.class.events.each do |event_name, state_transitions|
-        define_event event_name, state_transitions
-      end
-    end
-
-    def self.event event_name, state_transitions
-      events << [event_name, state_transitions]
-    end
-
-    def self.events
-      @events ||= []
-    end
-
-
-    private
-
-      def from_states
-        to_uniq_sym(sample_transitions.map(&:from))
+    module Graphviz
+      # Graphviz dot format for rendering as a directional graph
+      def to_graphviz_dot
+        transitions.map { |t| t.to_graphviz_dot }.sort.join(";")
       end
 
-      def to_states
-        to_uniq_sym(sample_transitions.map(&:to))
+      # Generates a url that renders states and events as a directional graph.
+      # See http://code.google.com/apis/chart/docs/gallery/graphviz.html
+      def google_chart_url
+        "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
+      end
+    end
+    include Graphviz
+
+    module Inspector
+      def begin_states
+        from_states - to_states
       end
 
-      def to_uniq_sym(array)
-        array.map(&:to_sym).uniq
+      def end_states
+        to_states - from_states
       end
 
-      def sample_transitions
-        (@subject || sample_subject).state_machine_definition.send :transitions
+      def states
+        (to_states + from_states).uniq
       end
 
-      def sample_subject
-        self_class = self.class
-        sample = Class.new do
-          extend SimpleStateMachine::Mountable
-          mount_state_machine self_class
+      private
+
+        def from_states
+          to_uniq_sym(sample_transitions.map(&:from))
         end
-        sample
+
+        def to_states
+          to_uniq_sym(sample_transitions.map(&:to))
+        end
+
+        def to_uniq_sym(array)
+          array.map(&:to_sym).uniq
+        end
+
+        def sample_transitions
+          (@subject || sample_subject).state_machine_definition.send :transitions
+        end
+
+        def sample_subject
+          self_class = self.class
+          sample = Class.new do
+            extend SimpleStateMachine::Mountable
+            mount_state_machine self_class
+          end
+          sample
+        end
+    end
+    include Inspector
+
+    module Mountable
+      def event event_name, state_transitions
+        events << [event_name, state_transitions]
       end
+
+      def events
+        @events ||= []
+      end
+
+      module InstanceMethods
+        def add_events
+          self.class.events.each do |event_name, state_transitions|
+            define_event event_name, state_transitions
+          end
+        end
+      end
+    end
+    extend Mountable
+    include Mountable::InstanceMethods
+
   end
 
   ##
@@ -262,7 +274,6 @@ module SimpleStateMachine
     def to_graphviz_dot
       %("#{from}"->"#{to}"[label=#{event_name}])
     end
-
 
     private
 
