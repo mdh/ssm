@@ -17,37 +17,43 @@ module SimpleStateMachine::ActiveRecord
       event_name_and_save = "#{event_name}_and_save"
       unless @subject.method_defined?(event_name_and_save)
         @subject.send(:define_method, event_name_and_save) do |*args|
+          result    = false
           old_state = self.send(self.class.state_machine_definition.state_method)
-          send "with_managed_state_#{event_name}", *args
-          if !self.errors.entries.empty?
-            self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-            return false
-          else
-            if save
-              return true
-            else
+          transaction do
+            send "with_managed_state_#{event_name}", *args
+            if !self.errors.entries.empty?
               self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-              return false
+            else
+              if save
+                result = true
+              else
+                self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+              end
             end
           end
+          return result
         end
         @subject.send :alias_method, "#{transition.event_name}", event_name_and_save
       end
       event_name_and_save_bang = "#{event_name_and_save}!"
       unless @subject.method_defined?(event_name_and_save_bang)
         @subject.send(:define_method, event_name_and_save_bang) do |*args|
+          result = nil
           old_state = self.send(self.class.state_machine_definition.state_method)
-          send "with_managed_state_#{event_name}", *args
-          if !self.errors.entries.empty?
-            self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-            raise ActiveRecord::RecordInvalid.new(self)
+          transaction do
+            send "with_managed_state_#{event_name}", *args
+            if !self.errors.entries.empty?
+              self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+              raise ActiveRecord::RecordInvalid.new(self)
+            end
+            begin
+              result = save!
+            rescue ActiveRecord::RecordInvalid
+              self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+              raise #re raise
+            end
           end
-          begin
-            save!
-          rescue ActiveRecord::RecordInvalid
-            self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-            raise #re raise
-          end
+          return result
         end
         @subject.send :alias_method, "#{transition.event_name}!", event_name_and_save_bang
       end

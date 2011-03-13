@@ -111,6 +111,24 @@ describe ActiveRecord do
       user.errors.entries.should == [['activation_code', 'is invalid']]
     end
 
+    it "rollsback if an exception is raised" do
+      user_class = Class.new(User)
+      user_class.instance_eval do
+        define_method :without_managed_state_invite do
+          User.create!(:name => 'name2') #this shouldn't be persisted
+          User.create! #this should raise an error
+        end
+      end
+      user_class.count.should == 0
+      user = user_class.create!(:name => 'name')
+      expect {
+        user.invite_and_save
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       "Validation failed: Name can't be blank")
+      user_class.count.should == 1
+      user_class.first.name.should == 'name'
+      user_class.first.should be_new
+    end
   end
 
   describe "event_and_save!" do
@@ -159,6 +177,25 @@ describe ActiveRecord do
       }.to raise_error(ActiveRecord::RecordInvalid,
                        "Validation failed: Activation code is invalid")
       user.should be_invited
+    end
+
+    it "rollsback if an exception is raised" do
+      user_class = Class.new(User)
+      user_class.instance_eval do
+        define_method :without_managed_state_invite do
+          User.create!(:name => 'name2') #this shouldn't be persisted
+          User.create! #this should raise an error
+        end
+      end
+      user_class.count.should == 0
+      user = user_class.create!(:name => 'name')
+      expect {
+        user.invite_and_save!
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       "Validation failed: Name can't be blank")
+      user_class.count.should == 1
+      user_class.first.name.should == 'name'
+      user_class.first.should be_new
     end
 
   end
