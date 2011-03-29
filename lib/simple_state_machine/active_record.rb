@@ -14,52 +14,63 @@ module SimpleStateMachine::ActiveRecord
     def decorate transition
       super transition
       event_name = transition.event_name.to_s
-      event_name_and_save = "#{event_name}_and_save"
-      unless @subject.method_defined?(event_name_and_save)
-        @subject.send(:define_method, event_name_and_save) do |*args|
-          result    = false
-          old_state = self.send(self.class.state_machine_definition.state_method)
-          transaction do
-            send "with_managed_state_#{event_name}", *args
-            if !self.errors.entries.empty?
-              self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-            else
-              if save
-                result = true
-              else
-                self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-              end
-            end
-          end
-          return result
-        end
-        @subject.send :alias_method, "#{transition.event_name}", event_name_and_save
-      end
-      event_name_and_save_bang = "#{event_name_and_save}!"
-      unless @subject.method_defined?(event_name_and_save_bang)
-        @subject.send(:define_method, event_name_and_save_bang) do |*args|
-          result = nil
-          old_state = self.send(self.class.state_machine_definition.state_method)
-          transaction do
-            send "with_managed_state_#{event_name}", *args
-            if !self.errors.entries.empty?
-              self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-              raise ActiveRecord::RecordInvalid.new(self)
-            end
-            begin
-              result = save!
-            rescue ActiveRecord::RecordInvalid
-              self.send("#{self.class.state_machine_definition.state_method}=", old_state)
-              raise #re raise
-            end
-          end
-          return result
-        end
-        @subject.send :alias_method, "#{transition.event_name}!", event_name_and_save_bang
-      end
+      decorate_save  event_name
+      decorate_save! event_name
     end
 
     protected
+
+      def decorate_save event_name
+        event_name_and_save = "#{event_name}_and_save"
+        unless @subject.method_defined?(event_name_and_save)
+          @subject.send(:define_method, event_name_and_save) do |*args|
+            result    = false
+            old_state = self.send(self.class.state_machine_definition.state_method)
+            transaction do
+              send "with_managed_state_#{event_name}", *args
+              if !self.errors.entries.empty?
+                self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+              else
+                if save
+                  result = true
+                else
+                  self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+                end
+              end
+            end
+            return result
+          end
+          @subject.send :alias_method, "#{event_name}", event_name_and_save
+        end
+      end
+
+      def decorate_save! event_name
+        event_name_and_save_bang = "#{event_name}_and_save!"
+        unless @subject.method_defined?(event_name_and_save_bang)
+          @subject.send(:define_method, event_name_and_save_bang) do |*args|
+            result = nil
+            old_state = self.send(self.class.state_machine_definition.state_method)
+            transaction do
+              send "with_managed_state_#{event_name}", *args
+              if !self.errors.entries.empty?
+                self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+                raise ActiveRecord::RecordInvalid.new(self)
+              end
+              begin
+                result = save!
+              rescue ActiveRecord::RecordInvalid
+                self.send("#{self.class.state_machine_definition.state_method}=", old_state)
+                raise #re raise
+              end
+            end
+            return result
+          end
+          @subject.send :alias_method, "#{event_name}!", event_name_and_save_bang
+        end
+      end
+
+      def decorate_ar_method
+      end
 
       def alias_event_methods event_name
         @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
