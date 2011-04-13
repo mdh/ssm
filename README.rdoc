@@ -78,7 +78,7 @@ To add a state machine to an ActiveRecord class, you will have to:
       extend SimpleStateMachine::ActiveRecord
 
       def after_initialize
-        self.ssm_state ||= 'pending'
+        self.state ||= 'pending'
        end
 
       def invite
