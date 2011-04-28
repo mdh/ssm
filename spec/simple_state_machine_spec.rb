@@ -85,20 +85,6 @@ describe SimpleStateMachine do
       example.should be_failed
     end
 
-    it "changes state to error_state when error can be caught" do
-      class_with_error = Class.new(@klass)
-      class_with_error.instance_eval do
-        define_method :raise_error do
-          raise RuntimeError.new
-        end
-        event :raise_error, :state1 => :state2, RuntimeError => :failed
-      end
-      example = class_with_error.new
-      example.should be_state1
-      example.raise_error
-      example.should be_failed
-    end
-
     it "changes state to error_state when error superclass can be caught" do
       error_subclass   = Class.new(RuntimeError)
       class_with_error = Class.new(@klass)
