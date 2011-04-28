@@ -264,7 +264,7 @@ module SimpleStateMachine
 
     # returns true if it's a error transition for event_name and error
     def is_error_transition_for?(event_name, error)
-      is_same_event?(event_name) && error.class == from
+      is_same_event?(event_name) && from.is_a?(Class) && error.is_a?(from)
     end
 
     def to_s
