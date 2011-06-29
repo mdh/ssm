@@ -122,7 +122,7 @@ describe ActiveRecord do
       user_class.count.should == 0
       user = user_class.create!(:name => 'name')
       expect {
-        user.invite_and_save
+        user.transaction { user.invite_and_save }
       }.to raise_error(ActiveRecord::RecordInvalid,
                        "Validation failed: Name can't be blank")
       user_class.count.should == 1
@@ -190,7 +190,7 @@ describe ActiveRecord do
       user_class.count.should == 0
       user = user_class.create!(:name => 'name')
       expect {
-        user.invite_and_save!
+        user.transaction { user.invite_and_save! }
       }.to raise_error(ActiveRecord::RecordInvalid,
                        "Validation failed: Name can't be blank")
       user_class.count.should == 1
