@@ -64,9 +64,10 @@ describe SimpleStateMachine::StateMachineDefinition do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
         def add_events
-          define_event(:event_a, :state1 => :state2)
-          define_event(:event_b, :state2 => :state3)
-          define_event(:event_c, :state1 => :state3)
+          define_event(:event_a, :state1      => :state2)
+          define_event(:event_b, :state2      => :state3)
+          define_event(:event_c, :state1      => :state3)
+          define_event(:event_c, RuntimeError => :state3)
         end
 
         def decorator_class
@@ -76,7 +77,7 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "returns all 'from' states that aren't 'to' states" do
-      @klass.new.begin_states.should == [:state1]
+      @klass.new.begin_states.should == [:state1, RuntimeError]
     end
   end
 

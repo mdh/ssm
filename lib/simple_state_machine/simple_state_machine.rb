@@ -135,7 +135,7 @@ module SimpleStateMachine
         end
 
         def to_uniq_sym(array)
-          array.map(&:to_sym).uniq
+          array.map { |state| state.is_a?(String) ? state.to_sym : state }.uniq
         end
 
         def sample_transitions
