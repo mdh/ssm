@@ -60,6 +60,32 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   end
 
+  describe '#default_error_state' do
+    subject do
+      klass = Class.new do
+        attr_reader :state
+        extend SimpleStateMachine
+        state_machine_definition.default_error_state = :failed
+
+        def initialize(state = 'state1')
+          @state = state
+        end
+
+        def event1
+          raise "Some error during event"
+        end
+        event :event1, :state1 => :state2
+      end
+      klass.new
+    end
+
+    it "is set when an error occurs during an event" do
+      subject.state.should == 'state1'
+      subject.event1
+      subject.state.should == 'failed'
+    end
+  end
+
   describe "#begin_states" do
     before do
       @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do

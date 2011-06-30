@@ -60,7 +60,8 @@ module SimpleStateMachine
   # Defines state machine transitions
   class StateMachineDefinition
 
-    attr_writer :state_method, :subject, :decorator, :decorator_class
+    attr_writer :default_error_state, :state_method, :subject, :decorator,
+                :decorator_class
 
     def decorator
       @decorator ||= decorator_class.new(@subject)
@@ -68,6 +69,10 @@ module SimpleStateMachine
 
     def decorator_class
       @decorator_class ||= Decorator
+    end
+
+    def default_error_state
+      @default_error_state && @default_error_state.to_s
     end
 
     def transitions
@@ -196,13 +201,18 @@ module SimpleStateMachine
     end
 
     # Transitions to the next state if next_state exists.
+    # When an error occurs, it uses the error to determine next state.
+    # If no next state can be determined it transitions to the default error
+    # state if defined, otherwise the error is re-raised.
     # Calls illegal_event_callback event_name if no next_state is found
     def transition(event_name)
       if to = next_state(event_name)
         begin
           result = yield
         rescue => e
-          if error_state = error_state(event_name, e)
+          error_state = error_state(event_name, e) ||
+            state_machine_definition.default_error_state
+          if error_state
             @subject.send("#{state_method}=", error_state)
             return result
           else
