@@ -22,5 +22,39 @@ describe SimpleStateMachine::StateMachine do
     end
   end
 
+  describe "#raised_error" do
+    context "given an error can be caught" do
+      let(:class_with_error) do
+        Class.new do
+          extend SimpleStateMachine
+          def initialize(state = 'state1'); @state = state; end
+          def raise_error
+            raise "Something went wrong"
+          end
+          event :raise_error, :state1 => :state2,
+                RuntimeError => :failed
+          event :retry,  :failed => :success
+        end
+      end
+
+      it "the raised error is accessible" do
+        example = class_with_error.new
+        example.raise_error
+        raised_error = example.state_machine.raised_error
+        raised_error.should be_a(RuntimeError)
+        raised_error.message.should == "Something went wrong"
+      end
+
+      it "the raised error is set to nil on the next transition" do
+        example = class_with_error.new
+        example.raise_error
+        example.state_machine.raised_error.should be
+        example.retry
+        example.state_machine.raised_error.should_not be
+      end
+
+    end
+  end
+
 end
 

@@ -183,6 +183,7 @@ module SimpleStateMachine
   ##
   # Defines the state machine used by the instance
   class StateMachine
+    attr_reader :raised_error
 
     def initialize(subject)
       @subject = subject
@@ -206,6 +207,7 @@ module SimpleStateMachine
     # state if defined, otherwise the error is re-raised.
     # Calls illegal_event_callback event_name if no next_state is found
     def transition(event_name)
+      clear_raised_error
       if to = next_state(event_name)
         begin
           result = yield
@@ -213,6 +215,7 @@ module SimpleStateMachine
           error_state = error_state(event_name, e) ||
             state_machine_definition.default_error_state
           if error_state
+            @raised_error = e
             @subject.send("#{state_method}=", error_state)
             return result
           else
@@ -237,6 +240,10 @@ module SimpleStateMachine
     end
 
     private
+
+      def clear_raised_error
+        @raised_error = nil
+      end
 
       def state_machine_definition
         @subject.class.state_machine_definition
