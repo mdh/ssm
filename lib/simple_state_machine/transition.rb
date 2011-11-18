@@ -8,7 +8,7 @@ module SimpleStateMachine
       @to         = to.to_s
     end
 
-    # returns true if it's a transition for event_name
+    # returns true if it's a transition for event_name and subject_state
     def is_transition_for?(event_name, subject_state)
       is_same_event?(event_name) && is_same_from?(subject_state)
     end
