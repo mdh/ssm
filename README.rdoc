@@ -21,8 +21,6 @@ Or add it to your Gemfile:
 
 == Usage
 
-== Basic
-
 Define an event and specify how the state should transition. If we want the state to change
 from :pending to :active we write:
 
