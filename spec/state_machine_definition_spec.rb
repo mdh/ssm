@@ -86,70 +86,6 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
   end
 
-  describe "#begin_states" do
-    before do
-      @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def add_events
-          define_event(:event_a, :state1      => :state2)
-          define_event(:event_b, :state2      => :state3)
-          define_event(:event_c, :state1      => :state3)
-          define_event(:event_c, RuntimeError => :state3)
-        end
-
-        def decorator_class
-          SimpleStateMachine::Decorator::Default
-        end
-      end
-    end
-
-    it "returns all 'from' states that aren't 'to' states" do
-      @klass.new.begin_states.should == [:state1, RuntimeError]
-    end
-  end
-
-  describe "#end_states" do
-    before do
-      @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def add_events
-          define_event(:event_a, :state1 => :state2)
-          define_event(:event_b, :state2 => :state3)
-          define_event(:event_c, :state1 => :state3)
-        end
-
-        def decorator_class
-          SimpleStateMachine::Decorator::Default
-        end
-
-      end
-    end
-
-    it "returns all 'to' states that aren't 'from' states" do
-      @klass.new.end_states.should == [:state3]
-    end
-  end
-
-  describe "#states" do
-    before do
-      @klass = Class.new(SimpleStateMachine::StateMachineDefinition) do
-        def add_events
-          define_event(:event_a, :state1 => :state2)
-          define_event(:event_b, :state2 => :state3)
-          define_event(:event_c, :state1 => :state3)
-        end
-
-        def decorator_class
-          SimpleStateMachine::Decorator::Default
-        end
-
-      end
-    end
-
-    it "returns all states" do
-      @klass.new.states.map(&:to_s).sort.should == %w{state1 state2 state3}
-    end
-  end
-
-
   describe "#transitions" do
     it "has a list of transitions" do
       @smd.transitions.should be_a(Array)
@@ -163,16 +99,5 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
   end
 
-  describe "#to_graphviz_dot" do
-    it "converts to graphviz dot format" do
-      @smd.to_graphviz_dot.should ==  %("state1"->"state2"[label=event1];"state2"->"state3"[label=event1])
-    end
-  end
-
-  describe "#google_chart_url" do
-    it "shows the state and event dependencies as a Google chart" do
-      @smd.google_chart_url.should == "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape @smd.to_graphviz_dot}}"
-    end
-  end
 end
 

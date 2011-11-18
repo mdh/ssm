@@ -1,5 +1,5 @@
 module SimpleStateMachine
-  class StateMachineDefinition
+  module Tools
     require 'cgi'
     module Graphviz
       # Graphviz dot format for rendering as a directional graph
@@ -13,6 +13,5 @@ module SimpleStateMachine
         "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape to_graphviz_dot}}"
       end
     end
-    include Graphviz
   end
 end
