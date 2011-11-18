@@ -154,34 +154,40 @@ If you like to separate your state machine from your model class, you can do so 
   end
 
 
-== Catching exceptions
+== Transitions
+
+=== Catching exceptions
 
 You can let the state machine handle exceptions by specifying the failure state for an Error:
 
   def download_data
-    Service.download_data
+    raise Service::ConnectionError
   end
-  event :download_data, :pending => :downloaded,
-        Service::ConnectionError => :download_failed
+  event :download_data, Service::ConnectionError => :download_failed
 
   download_data               # catches Service::ConnectionError
   state                       # => "download_failed"
   state_machine.raised_error  # the raised error
 
 
-== Catching all from states
+=== Catching all from states
 If an event should transition from all other defined states, you can use :all as from state:
 
   event :suspend, :all => :suspended
 
 
-== Generating state diagrams
+== Tools
+
+===Generating state diagrams
 
 When using Rails/ActiveRecord you can generate a state diagram of the state machine via the
 built in rake tasks.
 For details run:
 
   rake -T ssm
+
+A Googlechart example:
+http://tinyurl.com/79xztr6
 
 
 == Note on Patches/Pull Requests
