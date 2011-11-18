@@ -155,6 +155,12 @@ If you like to separate your state machine from your model class, you can do so 
 
 == Transitions
 
+=== Catching all from states
+If an event should transition from all other defined states, you can use :all as from state:
+
+  event :suspend, :all => :suspended
+
+
 === Catching exceptions
 
 You can let the state machine handle exceptions by specifying the failure state for an Error:
@@ -169,11 +175,11 @@ You can let the state machine handle exceptions by specifying the failure state 
   state_machine.raised_error  # the raised error
 
 
-=== Catching all from states
-If an event should transition from all other defined states, you can use :all as from state:
+=== Default error state
 
-  event :suspend, :all => :suspended
-
+To automatically change all states to a default error state use default_error_state:
+  
+  state_machine_definition.default_error_state = :failed
 
 == Tools
 
