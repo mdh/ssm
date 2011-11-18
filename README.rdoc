@@ -87,22 +87,13 @@ To add a state machine to an ActiveRecord class, you will have to:
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
       end
       event :invite, :pending => :invited
-
-      def confirm_invitation activation_code
-        if self.activation_code != activation_code
-          errors.add 'activation_code', 'is invalid'
-        end
-      end
-      event :confirm_invitation, :invited => :confirmed
     end
 
     user = User.new
-    user.pending?                       # => true
-    user.invite                         # => true
-    user.invited?                       # => true
-    user.confirm_invitation!('INVALID') # => ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
-    user.confirm_invitation!('VALID')
-    user.confirmed?                     # true
+    user.pending?         # => true
+    user.invite           # => true
+    user.invited?         # => true
+    user.activation_code  # => 'SOMEDIGEST'
 
 For the invite method this generates the following event methods
 - invite              (behaves like ActiveRecord save )
@@ -115,18 +106,26 @@ If you want to be more verbose you can also use:
 
 === Using ActiveRecord / ActiveModel validations
 
-When using ActiveRecord / ActiveModel you can add an error to the errors object:
-
-  def activate_account(activation_code)
-    if activation_code_invalid?(activation_code)
-      errors.add(:activation_code, 'Invalid')
-    end
-  end
-
-  activate_account!("INVALID_CODE") # => ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
-
+When using ActiveRecord / ActiveModel you can add an error to the errors object.
 This will prevent the state from being changed.
 
+If we add an activate_account method to User
+
+    class User  < ActiveRecord::Base
+      ...
+      def activate_account(activation_code)
+        if activation_code_invalid?(activation_code)
+          errors.add(:activation_code, 'Invalid')
+        end
+      end
+      event :invite, :invited => :confirmed
+      ...
+    end
+
+    user.confirm_invitation!('INVALID') # => raises ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
+    user.confirmed?                     # => false
+    user.confirm_invitation!('VALID')
+    user.confirmed?                     # => true
 
 == Mountable StateMachines
 
