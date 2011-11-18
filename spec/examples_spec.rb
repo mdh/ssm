@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
 describe "Examples" do
   describe "TrafficLight" do
@@ -13,7 +13,7 @@ describe "Examples" do
       tl.should be_green
     end
   end
-  
+
   describe "Lamp" do
     it "changes between :on and :off" do
       lamp = Lamp.new
@@ -28,13 +28,13 @@ describe "Examples" do
       lamp.should be_off
     end
   end
-  
+
   describe "Conversation" do
     it "is :unread by default" do
       conversation = Conversation.new
       conversation.should be_unread
     end
-    
+
     it "changes to read on view" do
       conversation = Conversation.new
       conversation.view

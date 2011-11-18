@@ -1,4 +1,4 @@
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
+require 'spec_helper'
 
 require "rubygems"
 require "bundler"
@@ -242,16 +242,16 @@ describe ActiveRecord do
 
     it "persists transitions" do
       ticket = Ticket.create!
-      ticket.should be_open
+      ticket.ssm_state.should == 'open'
       ticket.close!.should == true
-      ticket.should be_closed
+      ticket.ssm_state.should == 'closed'
     end
 
     it "persists transitions with !" do
       ticket = Ticket.create!
-      ticket.should be_open
+      ticket.ssm_state.should == 'open'
       ticket.close!
-      ticket.should be_closed
+      ticket.ssm_state.should == 'closed'
     end
 
   end
