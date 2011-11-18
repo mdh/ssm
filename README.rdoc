@@ -19,9 +19,23 @@ Or add it to your Gemfile:
   gem 'simple_state_machine'
 
 
-== Basic usage
+== Usage
 
-Define your event as a method, arguments are allowed:
+== Basic
+
+Define an event and specify how the state should transition. If we want the state to change
+from :pending to :active we write:
+
+  event :activate_account, :pending => :active
+
+That's it. You can now call activate_account and the state will automatically change.
+If the state change is not allowed, a SimpleStateMachine::IllegalStateTransitionError is
+raised.
+
+=== Methods with arguments
+
+If you want to pass arguments and call other methods before the state change, define your
+event asa method.
 
   def activate_account(activation_code)
     # call other methods, no need to add these in callbacks
@@ -29,13 +43,10 @@ Define your event as a method, arguments are allowed:
   end
 
 Now mark the method as an event and specify how the state should transition 
-when the method is called. If we want the state to change from :pending to :active we write:
+when the method is called. 
 
   event :activate_account, :pending => :active
 
-That's it!
-You can now call activate_account and the state will automatically change.
-If the state change is not allowed, a SimpleStateMachine::IllegalStateTransitionError is raised.
 
 
 == Basic example
@@ -48,9 +59,6 @@ If the state change is not allowed, a SimpleStateMachine::IllegalStateTransition
        self.state = 'off'
      end
 
-     def push_switch
-       puts "pushed switch"
-     end
      event :push_switch, :off => :on,
                          :on  => :off
 
@@ -59,10 +67,10 @@ If the state change is not allowed, a SimpleStateMachine::IllegalStateTransition
   lamp = LampSwitch.new
   lamp.state          # => 'off'
   lamp.off?           # => true
-  lamp.push_switch    # => 'pushed switch'
+  lamp.push_switch    #
   lamp.state          # => 'on'
   lamp.on?            # => true
-  lamp.push_switch    # => 'pushed switch'
+  lamp.push_switch    #
   lamp.off?           # => true
 
 
@@ -118,11 +126,12 @@ If we add an activate_account method to User
           errors.add(:activation_code, 'Invalid')
         end
       end
-      event :invite, :invited => :confirmed
+      event :activate_account, :invited => :confirmed
       ...
     end
 
-    user.confirm_invitation!('INVALID') # => raises ActiveRecord::RecordInvalid, "Validation failed: Activation code is invalid"
+    user.confirm_invitation!('INVALID') # => raises ActiveRecord::RecordInvalid,
+                                        #           "Validation failed: Activation code is invalid"
     user.confirmed?                     # => false
     user.confirm_invitation!('VALID')
     user.confirmed?                     # => true
