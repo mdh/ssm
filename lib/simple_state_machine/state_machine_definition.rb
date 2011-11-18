@@ -11,7 +11,7 @@ module SimpleStateMachine
     end
 
     def decorator_class
-      @decorator_class ||= Decorator
+      @decorator_class ||= Decorator::Default
     end
 
     def default_error_state

@@ -22,6 +22,7 @@ module SimpleStateMachine
       "#{from}.#{event_name}! => #{to}"
     end
 
+    # TODO move to Graphiz module
     def to_graphviz_dot
       %("#{from}"->"#{to}"[label=#{event_name}])
     end

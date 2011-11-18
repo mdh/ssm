@@ -1,8 +1,5 @@
 module SimpleStateMachine
 
-  class IllegalStateTransitionError < ::RuntimeError
-  end
-
   ##
   # Allows class to mount a state_machine
   module Mountable

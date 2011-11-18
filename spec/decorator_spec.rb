@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
-describe SimpleStateMachine::Decorator do
+describe SimpleStateMachine::Decorator::Default do
 
   context "given a class" do
     before do
@@ -10,7 +10,7 @@ describe SimpleStateMachine::Decorator do
           @state_machine_definition ||= SimpleStateMachine::StateMachineDefinition.new
         end
       end
-      decorator = SimpleStateMachine::Decorator.new klass
+      decorator = SimpleStateMachine::Decorator::Default.new klass
       decorator.decorate SimpleStateMachine::Transition.new(:event, :state1, :state2)
       @instance = klass.new
       @instance.state = 'state1'
@@ -55,7 +55,7 @@ describe SimpleStateMachine::Decorator do
         def event()   "predefined method" end
       end
       transition =  SimpleStateMachine::Transition.new(:event, :state1, :state2)
-      decorator = SimpleStateMachine::Decorator.new klass
+      decorator = SimpleStateMachine::Decorator::Default.new klass
       decorator.decorate transition
       klass.state_machine_definition.transitions << transition
       @instance = klass.new
@@ -102,7 +102,7 @@ describe SimpleStateMachine::Decorator do
         def event()   "predefined method" end
       end
       transition =  SimpleStateMachine::Transition.new(:event, :state1, :state2)
-      decorator = SimpleStateMachine::Decorator.new klass
+      decorator = SimpleStateMachine::Decorator::Default.new klass
       decorator.decorate transition
       klass.state_machine_definition.transitions << transition
       @instance = klass.new
@@ -154,7 +154,7 @@ describe SimpleStateMachine::Decorator do
         def event()   "predefined method" end
       end
       transition =  SimpleStateMachine::Transition.new(:event, :state1, :state2)
-      decorator = SimpleStateMachine::Decorator.new klass
+      decorator = SimpleStateMachine::Decorator::Default.new klass
       decorator.decorate transition
       klass.state_machine_definition.transitions << transition
       @instance = klass.new

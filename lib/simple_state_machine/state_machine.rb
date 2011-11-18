@@ -1,4 +1,7 @@
 module SimpleStateMachine
+
+  class IllegalStateTransitionError < ::RuntimeError; end
+
   ##
   # Defines the state machine used by the instance
   class StateMachine

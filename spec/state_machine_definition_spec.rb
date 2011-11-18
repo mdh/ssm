@@ -97,7 +97,7 @@ describe SimpleStateMachine::StateMachineDefinition do
         end
 
         def decorator_class
-          SimpleStateMachine::Decorator
+          SimpleStateMachine::Decorator::Default
         end
       end
     end
@@ -117,7 +117,7 @@ describe SimpleStateMachine::StateMachineDefinition do
         end
 
         def decorator_class
-          SimpleStateMachine::Decorator
+          SimpleStateMachine::Decorator::Default
         end
 
       end
@@ -138,7 +138,7 @@ describe SimpleStateMachine::StateMachineDefinition do
         end
 
         def decorator_class
-          SimpleStateMachine::Decorator
+          SimpleStateMachine::Decorator::Default
         end
 
       end

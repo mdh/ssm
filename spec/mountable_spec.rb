@@ -6,7 +6,7 @@ describe "Mountable" do
       event(:event, :state1 => :state2)
 
       def decorator_class
-        SimpleStateMachine::Decorator
+        SimpleStateMachine::Decorator::Default
       end
     end
     klass = Class.new do
