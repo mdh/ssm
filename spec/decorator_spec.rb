@@ -35,7 +35,7 @@ describe SimpleStateMachine::Decorator do
         @instance.state1?.should  == true
         @instance.state2?.should  == false
       end
-      
+
       it "defines an event method" do
         @instance.should respond_to(:event)
       end
@@ -87,7 +87,7 @@ describe SimpleStateMachine::Decorator do
       end
     end
   end
-  
+
   context "given a class with predefined protected methods" do
     before do
       klass = Class.new do
