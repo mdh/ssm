@@ -192,7 +192,7 @@ To automatically change all states to a default error state use default_error_st
 
 If you want to run events in transactions run them in a transaction block:
 
-  user.transaction { user.invite }
+  user.transaction { user.invite! }
 
 == Tools
 

@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.platform    = Gem::Platform::RUBY
 
   s.authors = ["Marek de Heus", "Petrik de Heus"]
-  s.description = %q{Simple State Machine is a state machine that focuses on events instead of states}
+  s.description = %q{A simple DSL to decorate existing methods with state transition guards.}
   s.email = ["FIX@example.com"]
   s.homepage = %q{http://github.com/mdh/ssm}
   s.extra_rdoc_files = [
