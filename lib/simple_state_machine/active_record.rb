@@ -65,9 +65,6 @@ module SimpleStateMachine::ActiveRecord
         end
       end
 
-      def decorate_ar_method
-      end
-
       def alias_event_methods event_name
         @subject.send :alias_method, "#{event_name}_without_managed_state", event_name
       end
