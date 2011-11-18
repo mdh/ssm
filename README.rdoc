@@ -32,8 +32,8 @@ raised.
 
 === Methods with arguments
 
-If you want to pass arguments and call other methods before the state change, define your
-event asa method.
+If you want to pass arguments and call other methods before the state transition, define your
+event as a method.
 
   def activate_account(activation_code)
     # call other methods, no need to add these in callbacks
