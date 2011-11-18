@@ -13,7 +13,7 @@ describe "Mountable" do
       attr_accessor :event_called
       extend SimpleStateMachine::Mountable
       mount_state_machine mountable_class
-      def without_managed_state_event
+      def event_without_managed_state
         @event_called = true
       end
     end

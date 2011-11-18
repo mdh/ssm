@@ -349,10 +349,10 @@ module SimpleStateMachine
 
       def decorate_event_method event_name
         # TODO put in transaction for activeRecord?
-        unless @subject.method_defined?("with_managed_state_#{event_name}")
-          @subject.send(:define_method, "with_managed_state_#{event_name}") do |*args|
+        unless @subject.method_defined?("#{event_name}_with_managed_state")
+          @subject.send(:define_method, "#{event_name}_with_managed_state") do |*args|
             return state_machine.transition(event_name) do
-              send("without_managed_state_#{event_name}", *args)
+              send("#{event_name}_without_managed_state", *args)
             end
           end
           alias_event_methods event_name
@@ -382,8 +382,8 @@ module SimpleStateMachine
     protected
 
       def alias_event_methods event_name
-        @subject.send :alias_method, "without_managed_state_#{event_name}", event_name
-        @subject.send :alias_method, event_name, "with_managed_state_#{event_name}"
+        @subject.send :alias_method, "#{event_name}_without_managed_state", event_name
+        @subject.send :alias_method, event_name, "#{event_name}_with_managed_state"
       end
 
       def state_method

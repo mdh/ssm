@@ -114,7 +114,7 @@ describe ActiveRecord do
     it "rollsback if an exception is raised" do
       user_class = Class.new(User)
       user_class.instance_eval do
-        define_method :without_managed_state_invite do
+        define_method :invite_without_managed_state do
           User.create!(:name => 'name2') #this shouldn't be persisted
           User.create! #this should raise an error
         end
@@ -182,7 +182,7 @@ describe ActiveRecord do
     it "rollsback if an exception is raised" do
       user_class = Class.new(User)
       user_class.instance_eval do
-        define_method :without_managed_state_invite do
+        define_method :invite_without_managed_state do
           User.create!(:name => 'name2') #this shouldn't be persisted
           User.create! #this should raise an error
         end
