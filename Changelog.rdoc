@@ -1,0 +1,16 @@
+== 0.6.0
+=== Enhancements
+- Define decorated methods as #{event_name}_with_managed_state instead of with_managed_state_#{event_name} [Petrik]
+- Added raised_error method to access caught Errors [Petrik]
+- Added support for a default error state [Marek de Heus]
+- Removed transaction support, you can still add it manually, see active_record_spec.rb [Marek de Heus]
+- Allow catching errors for subclasses of the error [Petrik]
+- Added gem install instructions [Marek de Heus]
+- Added define_event method to simplify mountable state machine definitions [Petrik]
+- Added end_states method so we can check the state machine correctness [Petrik]
+- Added begin_states method so we can check the state machine correctness [Petrik]
+
+=== Bugfixes
+- Fixed bug in Inspector, from state can now be a Error class [Marek de Heus]
+- Make sure from and end states are uniq [Petrik]
+- fixed typos (graphiz -> graphviz) (redmar-master) [rjk]
