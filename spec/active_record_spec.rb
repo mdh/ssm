@@ -1,12 +1,5 @@
 require 'spec_helper'
 
-require "rubygems"
-require "bundler"
-Bundler.require
-#Bundler.setup(:test)#, :activerecord)
-require 'active_record'
-require 'examples/user'
-
 ActiveRecord::Base.logger = Logger.new "test.log"
 ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
                                         :database => ":memory:")
