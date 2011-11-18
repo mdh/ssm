@@ -161,9 +161,9 @@ You can let the state machine handle exceptions by specifying the failure state 
   event :download_data, :pending => :downloaded,
         Service::ConnectionError => :download_failed
 
-  download_data # catches Service::ConnectionError
-  state         # => "download_failed"
-
+  download_data               # catches Service::ConnectionError
+  state                       # => "download_failed"
+  state_machine.raised_error  # the raised error
 
 == Catching all from states
 If an event should transition from all other defined states, you can use :all as from state:
