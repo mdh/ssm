@@ -14,7 +14,7 @@ from :pending to :active we write:
 
   event :activate_account, :pending => :active
 
-That's it. You can now call activate_account and the state will automatically change.
+That's it. You can now call *activate_account* and the state will automatically change.
 If the state change is not allowed, a SimpleStateMachine::IllegalStateTransitionError is
 raised.
 
@@ -62,12 +62,15 @@ when the method is called.
 
 == ActiveRecord
 
+For ActiveRecord methods are decorated with state transition guards _and_ persistence.
+Methods marked as events behave like ActiveRecord save and save!.
+
 === Example
 
 To add a state machine to an ActiveRecord class, you will have to:
-- extend SimpleStateMachine::ActiveRecord,
-- set the initial state in after_initialize,
-- turn methods into events
+* extend SimpleStateMachine::ActiveRecord,
+* set the initial state in after_initialize,
+* turn methods into events
 
     class User < ActiveRecord::Base
 
@@ -90,12 +93,12 @@ To add a state machine to an ActiveRecord class, you will have to:
     user.activation_code  # => 'SOMEDIGEST'
 
 For the invite method this generates the following event methods
-- invite              (behaves like ActiveRecord save )
-- invite!             (behaves like ActiveRecord save!)
+* invite              (behaves like ActiveRecord save )
+* invite!             (behaves like ActiveRecord save!)
 
 If you want to be more verbose you can also use:
-- invite_and_save  (alias for invite)
-- invite_and_save! (alias for invite!)
+* invite_and_save  (alias for invite)
+* invite_and_save! (alias for invite!)
 
 
 === Using ActiveRecord / ActiveModel validations
