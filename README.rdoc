@@ -7,18 +7,6 @@ to help you encapsulate state and guard state transitions.
 
 It supports exception rescuing, google chart visualization and mountable state machines.
 
-
-== Installation
-
-Use gem install:
-
-  gem install simple_state_machine
-
-Or add it to your Gemfile:
-
-  gem 'simple_state_machine'
-
-
 == Usage
 
 Define an event and specify how the state should transition. If we want the state to change
@@ -207,6 +195,15 @@ For details run:
 A Googlechart example:
 http://tinyurl.com/79xztr6
 
+== Installation
+
+Use gem install:
+
+  gem install simple_state_machine
+
+Or add it to your Gemfile:
+
+  gem 'simple_state_machine'
 
 == Note on Patches/Pull Requests
 
