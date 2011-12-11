@@ -10,7 +10,7 @@ It supports exception rescuing, google chart visualization and mountable state m
 == Usage
 
 Define an event and specify how the state should transition. If we want the state to change
-from :pending to :active we write:
+from *pending* to *active* we write:
 
   event :activate_account, :pending => :active
 
@@ -63,7 +63,7 @@ when the method is called.
 == ActiveRecord
 
 For ActiveRecord methods are decorated with state transition guards _and_ persistence.
-Methods marked as events behave like ActiveRecord save and save!.
+Methods marked as events behave like ActiveRecord *save* and *save!*.
 
 === Example
 
@@ -93,12 +93,12 @@ To add a state machine to an ActiveRecord class, you will have to:
     user.activation_code  # => 'SOMEDIGEST'
 
 For the invite method this generates the following event methods
-* invite              (behaves like ActiveRecord save )
-* invite!             (behaves like ActiveRecord save!)
+* *invite*              (behaves like ActiveRecord save )
+* *invite!*             (behaves like ActiveRecord save!)
 
 If you want to be more verbose you can also use:
-* invite_and_save  (alias for invite)
-* invite_and_save! (alias for invite!)
+* *invite_and_save*  (alias for invite)
+* *invite_and_save!* (alias for invite!)
 
 
 === Using ActiveRecord / ActiveModel validations
@@ -154,7 +154,7 @@ If you like to separate your state machine from your model class, you can do so 
 == Transitions
 
 === Catching all from states
-If an event should transition from all other defined states, you can use :all as from state:
+If an event should transition from all other defined states, you can use the *:all* state:
 
   event :suspend, :all => :suspended
 
@@ -164,18 +164,18 @@ If an event should transition from all other defined states, you can use :all as
 You can let the state machine handle exceptions by specifying the failure state for an Error:
 
   def download_data
-    raise Service::ConnectionError
+    raise Service::ConnectionError, "Uhoh"
   end
   event :download_data, Service::ConnectionError => :download_failed
 
   download_data               # catches Service::ConnectionError
   state                       # => "download_failed"
-  state_machine.raised_error  # the raised error
+  state_machine.raised_error  # "Uhoh"
 
 
 === Default error state
 
-To automatically change all states to a default error state use default_error_state:
+To automatically catch all exceptions to a default error state use default_error_state:
   
   state_machine_definition.default_error_state = :failed
 
