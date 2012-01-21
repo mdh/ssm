@@ -1,5 +1,7 @@
 = SimpleStateMachine
 
+{<img src="https://secure.travis-ci.org/fourstack/ssm.png" />}[http://travis-ci.org/fourstack/ssm]
+
 A simple DSL to decorate existing methods with state transition guards.
 
 Instead of using a DSL to define events, SimpleStateMachine decorates methods 
