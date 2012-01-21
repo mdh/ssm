@@ -66,6 +66,7 @@ module SimpleStateMachine
 
         def define_state_getter_method
           unless any_method_defined?(state_method)
+            @subject.send(:public) #required for ruby 1.9.2-p290
             @subject.send(:attr_reader, state_method)
           end
         end
