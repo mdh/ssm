@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'logger'
 
 ActiveRecord::Base.logger = Logger.new "test.log"
 ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
@@ -32,9 +33,7 @@ class Ticket < ActiveRecord::Base
 
   state_machine_definition.state_method = :ssm_state
 
-  def after_initialize
-    self.ssm_state ||= 'open'
-  end
+  after_initialize lambda { self.ssm_state ||= 'open' }
 
   event :close, :open => :closed
 end
@@ -101,7 +100,7 @@ describe ActiveRecord do
       user.should be_invited
       user.confirm_invitation_and_save('x').should == false
       user.should be_invited
-      user.errors.entries.should == [['activation_code', 'is invalid']]
+      user.errors.get(:activation_code).should == ['is invalid']
     end
 
     it "rollsback if an exception is raised" do
@@ -207,7 +206,7 @@ describe ActiveRecord do
       user.should be_invited
       user.confirm_invitation('x').should == false
       user.should be_invited
-      user.errors.entries.should == [['activation_code', 'is invalid']]
+      user.errors.get(:activation_code).should == ['is invalid']
     end
 
   end
