@@ -5,12 +5,13 @@ class User < ActiveRecord::Base
 
   extend SimpleStateMachine::ActiveRecord
 
-  after_initialize lambda {
+  after_initialize :after_initialize
+  def after_initialize
     self.state ||= 'new'
     # if you get an ActiveRecord::MissingAttributeError
     # you'll probably need to do (http://bit.ly/35q23b):
     #   write_attribute(:ssm_state, "pending") unless read_attribute(:ssm_state)
-  }
+  end
 
   def invite
     self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")

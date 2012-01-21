@@ -33,7 +33,10 @@ class Ticket < ActiveRecord::Base
 
   state_machine_definition.state_method = :ssm_state
 
-  after_initialize lambda { self.ssm_state ||= 'open' }
+  after_initialize :after_initialize
+  def after_initialize
+    self.ssm_state ||= 'open'
+  end
 
   event :close, :open => :closed
 end
