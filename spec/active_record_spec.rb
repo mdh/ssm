@@ -103,7 +103,7 @@ describe ActiveRecord do
       user.should be_invited
       user.confirm_invitation_and_save('x').should == false
       user.should be_invited
-      user.errors.get(:activation_code).should == ['is invalid']
+      user.errors[:activation_code].should == ['is invalid']
     end
 
     it "rollsback if an exception is raised" do
@@ -209,7 +209,7 @@ describe ActiveRecord do
       user.should be_invited
       user.confirm_invitation('x').should == false
       user.should be_invited
-      user.errors.get(:activation_code).should == ['is invalid']
+      user.errors[:activation_code].should == ['is invalid']
     end
 
   end
