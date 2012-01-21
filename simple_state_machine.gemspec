@@ -18,11 +18,5 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.7}
   s.summary          = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
   s.test_files       = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.add_development_dependency "rake"
-  s.add_development_dependency "ZenTest"
-  s.add_development_dependency "rspec"
-  s.add_development_dependency "activerecord", "~>2.3.5"
-  s.add_development_dependency "sqlite3-ruby"
-  s.add_development_dependency "ruby-debug"
 end
 

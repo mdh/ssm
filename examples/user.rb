@@ -5,6 +5,7 @@ class User < ActiveRecord::Base
 
   extend SimpleStateMachine::ActiveRecord
 
+  after_initialize :after_initialize
   def after_initialize
     self.state ||= 'new'
     # if you get an ActiveRecord::MissingAttributeError
