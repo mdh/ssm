@@ -10,4 +10,5 @@ script: bundle exec rspec spec
 
 gemfile:
   - gemfiles/Gemfile.rails-2.3.x
+  - gemfiles/Gemfile.basic
   - Gemfile
