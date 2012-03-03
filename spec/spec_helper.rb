@@ -1,7 +1,6 @@
 require "rubygems"
 require "bundler"
 Bundler.require :test
-#Bundler.setup(:test, :activerecord)
 begin
   require 'active_record'
 rescue LoadError
