@@ -17,5 +17,5 @@ require 'simple_state_machine'
 require File.join(ROOT, 'examples', 'conversation.rb')
 require File.join(ROOT, 'examples', 'lamp.rb')
 require File.join(ROOT, 'examples', 'traffic_light.rb')
-require File.join(ROOT, 'examples', 'user.rb') #if defined? ActiveRecord
+require File.join(ROOT, 'examples', 'user.rb') if defined? ActiveRecord
 
