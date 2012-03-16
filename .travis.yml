@@ -5,9 +5,10 @@ rvm:
   - 1.9.3
   #- jruby-18mode # JRuby in 1.8 mode
   #- jruby-19mode # JRuby in 1.9 mode
-  - rbx-2.0
+  - rbx
 script: bundle exec rspec spec
 
 gemfile:
   - gemfiles/Gemfile.rails-2.3.x
+  - gemfiles/Gemfile.basic
   - Gemfile
