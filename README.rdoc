@@ -146,7 +146,7 @@ If you like to separate your state machine from your model class, you can do so 
     extend SimpleStateMachine::Mountable
     mount_state_machine MyStateMachine
 
-    def after_initialize
+    after_initialize do
       self.state ||= 'new'
     end
 
