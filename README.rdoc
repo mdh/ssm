@@ -78,9 +78,9 @@ To add a state machine to an ActiveRecord class, you will have to:
 
       extend SimpleStateMachine::ActiveRecord
 
-      def after_initialize
+      after_initialize do
         self.state ||= 'pending'
-       end
+      end
 
       def invite
         self.activation_code = Digest::SHA1.hexdigest("salt #{Time.now.to_f}")
