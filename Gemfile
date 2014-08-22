@@ -7,6 +7,6 @@ group :test do
   #gem "rake"
   gem "ZenTest"
   gem "rspec"
-  gem "activerecord", "~>3.1.3"
-  gem "sqlite3-ruby"
+  gem "activerecord", "~>3.2.0"
+  gem "sqlite3"
 end
