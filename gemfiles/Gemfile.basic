@@ -2,7 +2,5 @@
 source "http://rubygems.org"
 
 group :test do
-  #gem "rake"
-  gem "ZenTest"
   gem "rspec"
 end
