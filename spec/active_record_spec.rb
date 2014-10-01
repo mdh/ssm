@@ -9,7 +9,6 @@ if defined? ActiveRecord
   def setup_db
     ActiveRecord::Schema.define(:version => 1) do
       create_table :users do |t|
-        t.column :id,               :integer
         t.column :name,             :string
         t.column :state,            :string
         t.column :activation_code,  :string
@@ -17,7 +16,6 @@ if defined? ActiveRecord
         t.column :updated_at,       :datetime
       end
       create_table :tickets do |t|
-        t.column :id,         :integer
         t.column :ssm_state,  :string
       end
     end
@@ -54,6 +52,13 @@ if defined? ActiveRecord
 
     it "has a default state" do
       User.new.should be_new
+    end
+
+    it "persists transitions when using send and a symbol" do
+      user = User.create!(:name => 'name')
+      user.send(:invite_and_save).should == true
+      User.find(user.id).should be_invited
+      User.find(user.id).activation_code.should_not be_nil
     end
 
     # TODO needs nesting/grouping, seems to have some duplication
@@ -124,6 +129,14 @@ if defined? ActiveRecord
         user_class.count.should == 1
         user_class.first.name.should == 'name'
         user_class.first.should be_new
+      end
+
+      it "raises an error if an invalid state_transition is called" do
+        user = User.create!(:name => 'name')
+        expect {
+          user.confirm_invitation_and_save! 'abc'
+        }.to raise_error(SimpleStateMachine::IllegalStateTransitionError,
+                         "You cannot 'confirm_invitation' when state is 'new'")
       end
     end
 
