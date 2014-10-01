@@ -37,20 +37,20 @@ describe SimpleStateMachine::StateMachine do
         end
       end
 
+      subject do
+        class_with_error.new.tap{|i| i.raise_error }
+      end
+
       it "the raised error is accessible" do
-        example = class_with_error.new
-        example.raise_error
-        raised_error = example.state_machine.raised_error
+        raised_error = subject.state_machine.raised_error
         raised_error.should be_a(RuntimeError)
         raised_error.message.should == "Something went wrong"
       end
 
       it "the raised error is set to nil on the next transition" do
-        example = class_with_error.new
-        example.raise_error
-        example.state_machine.raised_error.should be
-        example.retry
-        example.state_machine.raised_error.should_not be
+        subject.state_machine.raised_error.should be
+        subject.retry
+        subject.state_machine.raised_error.should_not be
       end
 
     end

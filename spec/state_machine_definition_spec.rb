@@ -2,24 +2,24 @@ require 'spec_helper'
 
 describe SimpleStateMachine::StateMachineDefinition do
 
-  before do
-    @klass = Class.new do
+  let(:klass) do
+    Class.new do
       extend SimpleStateMachine
       def initialize(state = 'state1')
         @state = state
       end
       event :event1, :state1 => :state2, :state2 => :state3
     end
-    @smd = @klass.state_machine_definition
   end
+  let(:smd) { klass.state_machine_definition }
 
   it "is inherited by subclasses" do
-    example = Class.new(@klass).new
-    example.should be_state1
-    example.event1
-    example.should be_state2
-    example.event1
-    example.should be_state3
+    subject = Class.new(klass).new
+    subject.should be_state1
+    subject.event1
+    subject.should be_state2
+    subject.event1
+    subject.should be_state3
   end
 
   describe '#state_method' do
@@ -88,14 +88,14 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   describe "#transitions" do
     it "has a list of transitions" do
-      @smd.transitions.should be_a(Array)
-      @smd.transitions.first.should be_a(SimpleStateMachine::Transition)
+      smd.transitions.should be_a(Array)
+      smd.transitions.first.should be_a(SimpleStateMachine::Transition)
     end
   end
 
   describe "#to_s" do
     it "converts to readable string format" do
-      @smd.to_s.should =~ Regexp.new("state1.event1! => state2")
+      smd.to_s.should =~ Regexp.new("state1.event1! => state2")
     end
   end
 
