@@ -3,8 +3,13 @@ require 'logger'
 
 if defined? ActiveRecord
   ActiveRecord::Base.logger = Logger.new "test.log"
-  ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
+  begin
+    ActiveRecord::Base.establish_connection(:adapter  => "sqlite3",
                                           :database => ":memory:")
+  rescue
+    ActiveRecord::Base.establish_connection(:adapter  => "jdbc-sqlite3",
+                                          :database => ":memory:")
+  end
 
   def setup_db
     ActiveRecord::Schema.define(:version => 1) do
