@@ -71,15 +71,6 @@ if defined? ActiveRecord
         User.find(user.id).activation_code.should_not be_nil
       end
 
-      it "persist transitions even when state is attr_protected" do
-        user_class = Class.new(User)
-        user_class.instance_eval { attr_protected :state }
-        user = user_class.create!(:name => 'name', :state => 'x')
-        user.should be_new
-        user.invite_and_save
-        user.reload.should be_invited
-      end
-
       it "persists transitions when using send and a symbol" do
         user = User.create!(:name => 'name')
         user.send(:invite_and_save).should == true
@@ -147,15 +138,6 @@ if defined? ActiveRecord
         user.invite_and_save!.should == true
         User.find(user.id).should be_invited
         User.find(user.id).activation_code.should_not be_nil
-      end
-
-      it "persist transitions even when state is attr_protected" do
-        user_class = Class.new(User)
-        user_class.instance_eval { attr_protected :state }
-        user = user_class.create!(:name => 'name', :state => 'x')
-        user.should be_new
-        user.invite_and_save!
-        user.reload.should be_invited
       end
 
       it "raises an error if an invalid state_transition is called" do
