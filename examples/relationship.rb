@@ -2,23 +2,23 @@
 #
 # class Relationship
 #   include AASM
-# 
+#
 #   aasm_column :status
-# 
+#
 #   aasm_initial_state Proc.new { |relationship| relationship.strictly_for_fun? ? :intimate : :dating }
-# 
+#
 #   aasm_state :dating,   :enter => :make_happy,        :exit => :make_depressed
 #   aasm_state :intimate, :enter => :make_very_happy,   :exit => :never_speak_again
 #   aasm_state :married,  :enter => :give_up_intimacy,  :exit => :buy_exotic_car_and_wear_a_combover
-# 
+#
 #   aasm_event :get_intimate do
 #     transitions :to => :intimate, :from => [:dating], :guard => :drunk?
 #   end
-# 
+#
 #   aasm_event :get_married do
 #     transitions :to => :married, :from => [:dating, :intimate], :guard => :willing_to_give_up_manhood?
 #   end
-# 
+#
 #   def strictly_for_fun?; end
 #   def drunk?; end
 #   def willing_to_give_up_manhood?; end
@@ -32,7 +32,7 @@
 
 class Relationship
   extend SimpleStateMachine
-  
+
   def initialize
     self.state = relationship.strictly_for_fun? ? get_intimate : start_dating
   end
