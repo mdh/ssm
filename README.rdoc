@@ -1,6 +1,6 @@
 = SimpleStateMachine
 
-{<img src="https://secure.travis-ci.org/fourstack/ssm.png" />}[http://travis-ci.org/fourstack/ssm]
+{<img src="https://secure.travis-ci.org/mdh/ssm.png" />}[http://travis-ci.org/mdh/ssm]
 
 A simple DSL to decorate existing methods with state transition guards.
 
