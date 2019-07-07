@@ -5,10 +5,12 @@ require 'simple_state_machine/tools/inspector'
 require 'simple_state_machine/state_machine_definition'
 require 'simple_state_machine/transition'
 require 'simple_state_machine/decorator/default'
-if defined?(ActiveRecord)
+
+ActiveSupport.on_load(:active_record) do
   require 'simple_state_machine/active_record'
   require 'simple_state_machine/decorator/active_record'
 end
+
 if defined?(Rails::Railtie)
   require "simple_state_machine/railtie"
 end
