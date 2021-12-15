@@ -1,3 +1,9 @@
+== 0.6.1
+- Remove old rubygems version requirement
+- Remove some trailing whitespace [Petrik]
+- Use `expect` instead if old `should` notation [Petrik]
+- Drop support for Ruby 1.9 [Petrik]
+
 == 0.6.0
 === Enhancements
 - Define decorated methods as #{event_name}_with_managed_state instead of with_managed_state_#{event_name} [Petrik]
