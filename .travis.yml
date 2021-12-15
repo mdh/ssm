@@ -3,6 +3,7 @@ rvm:
   - 2.5
   - 2.7
   - 3.0
+  - jruby-9.2.16.0
 script: bundle exec rspec spec
 
 gemfile:
