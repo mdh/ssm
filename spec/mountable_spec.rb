@@ -24,13 +24,13 @@ describe SimpleStateMachine::Mountable do
   end
 
   it "has state_helper methods" do
-    subject.should be_state1
-    subject.should_not be_state2
+    expect(subject).to be_state1
+    expect(subject).not_to be_state2
   end
 
   it "calls existing methods" do
     subject.event
-    subject.should be_state2
-    subject.event_called.should == true
+    expect(subject).to be_state2
+    expect(subject.event_called).to eq(true)
   end
 end

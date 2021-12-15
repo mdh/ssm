@@ -14,11 +14,11 @@ describe SimpleStateMachine::StateMachine do
     end
 
     it "returns the next state for the event and current state" do
-      subject.next_state('event1').should == 'state2'
+      expect(subject.next_state('event1')).to eq('state2')
     end
 
     it "returns nil if no next state for the event and current state exists" do
-      subject.next_state('event2').should be_nil
+      expect(subject.next_state('event2')).to be_nil
     end
   end
 
@@ -43,14 +43,14 @@ describe SimpleStateMachine::StateMachine do
 
       it "the raised error is accessible" do
         raised_error = subject.state_machine.raised_error
-        raised_error.should be_a(RuntimeError)
-        raised_error.message.should == "Something went wrong"
+        expect(raised_error).to be_a(RuntimeError)
+        expect(raised_error.message).to eq("Something went wrong")
       end
 
       it "the raised error is set to nil on the next transition" do
-        subject.state_machine.raised_error.should be
+        expect(subject.state_machine.raised_error).to be
         subject.retry
-        subject.state_machine.raised_error.should_not be
+        expect(subject.state_machine.raised_error).not_to be
       end
 
     end

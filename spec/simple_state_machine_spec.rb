@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SimpleStateMachine do
 
   it "has an error that extends RuntimeError" do
-    SimpleStateMachine::IllegalStateTransitionError.superclass.should == RuntimeError
+    expect(SimpleStateMachine::IllegalStateTransitionError.superclass).to eq(RuntimeError)
   end
 
   let(:klass) do
@@ -26,8 +26,8 @@ describe SimpleStateMachine do
         event :event2, :state2 => :state3
       end
       subject = klass.new
-      subject.event1.should == nil
-      subject.event2.should == 'event2'
+      expect(subject.event1).to eq(nil)
+      expect(subject.event2).to eq('event2')
     end
 
     it "calls existing methods" do
@@ -40,7 +40,7 @@ describe SimpleStateMachine do
       end
       subject = klass.new
       subject.event
-      subject.event_called.should == true
+      expect(subject.event_called).to eq(true)
     end
 
     context "given an event has multiple transitions" do
@@ -52,11 +52,11 @@ describe SimpleStateMachine do
 
       it "changes state for all transitions" do
         subject = klass.new
-        subject.should be_state1
+        expect(subject).to be_state1
         subject.event
-        subject.should be_state2
+        expect(subject).to be_state2
         subject.event
-        subject.should be_state3
+        expect(subject).to be_state3
       end
     end
 
@@ -70,11 +70,11 @@ describe SimpleStateMachine do
       it "changes state for all from states" do
         subject = klass.new
         subject.event
-        subject.should be_state3
+        expect(subject).to be_state3
         subject = klass.new 'state2'
-        subject.should be_state2
+        expect(subject).to be_state2
         subject.event
-        subject.should be_state3
+        expect(subject).to be_state3
       end
     end
 
@@ -89,11 +89,11 @@ describe SimpleStateMachine do
       it "changes state from all states" do
         subject = klass.new
         subject.event
-        subject.should be_state3
+        expect(subject).to be_state3
         subject = klass.new 'state2'
-        subject.should be_state2
+        expect(subject).to be_state2
         subject.event
-        subject.should be_state3
+        expect(subject).to be_state3
       end
     end
 
@@ -106,9 +106,9 @@ describe SimpleStateMachine do
 
       it "changes state" do
         subject = klass.new :state1
-        subject.state.should == :state1
+        expect(subject.state).to eq(:state1)
         subject.send(:event)
-        subject.should be_state2
+        expect(subject).to be_state2
       end
     end
 
@@ -122,9 +122,9 @@ describe SimpleStateMachine do
           event :raise_error, :state1 => :state2, RuntimeError => :failed
         end
         subject = class_with_error.new
-        subject.should be_state1
+        expect(subject).to be_state1
         subject.raise_error
-        subject.should be_failed
+        expect(subject).to be_failed
       end
 
       it "changes state to error_state when error superclass can be caught" do
@@ -137,9 +137,9 @@ describe SimpleStateMachine do
           event :raise_error, :state1 => :state2, RuntimeError => :failed
         end
         subject = class_with_error.new
-        subject.should be_state1
+        expect(subject).to be_state1
         subject.raise_error
-        subject.should be_failed
+        expect(subject).to be_failed
       end
     end
 
@@ -153,7 +153,7 @@ describe SimpleStateMachine do
 
       it "raises an IllegalStateTransitionError" do
         subject = klass.new
-        lambda { subject.event2 }.should raise_error(
+        expect { subject.event2 }.to raise_error(
             SimpleStateMachine::IllegalStateTransitionError,
             "You cannot 'event2' when state is 'state1'")
       end

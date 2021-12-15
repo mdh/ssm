@@ -19,7 +19,7 @@ describe SimpleStateMachine::Tools::Inspector do
     end
 
     it "returns all 'from' states that aren't 'to' states" do
-      @klass.new.begin_states.should == [:state1, RuntimeError]
+      expect(@klass.new.begin_states).to eq([:state1, RuntimeError])
     end
   end
 
@@ -40,7 +40,7 @@ describe SimpleStateMachine::Tools::Inspector do
     end
 
     it "returns all 'to' states that aren't 'from' states" do
-      @klass.new.end_states.should == [:state3]
+      expect(@klass.new.end_states).to eq([:state3])
     end
   end
 
@@ -61,7 +61,7 @@ describe SimpleStateMachine::Tools::Inspector do
     end
 
     it "returns all states" do
-      @klass.new.states.map(&:to_s).sort.should == %w{state1 state2 state3}
+      expect(@klass.new.states.map(&:to_s).sort).to eq(%w{state1 state2 state3})
     end
   end
 

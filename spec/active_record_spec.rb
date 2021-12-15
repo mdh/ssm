@@ -50,14 +50,14 @@ if defined? ActiveRecord
     end
 
     it "has a default state" do
-      User.new.should be_new
+      expect(User.new).to be_new
     end
 
     it "persists transitions when using send and a symbol" do
       user = User.create!(:name => 'name')
-      user.send(:invite_and_save).should == true
-      User.find(user.id).should be_invited
-      User.find(user.id).activation_code.should_not be_nil
+      expect(user.send(:invite_and_save)).to eq(true)
+      expect(User.find(user.id)).to be_invited
+      expect(User.find(user.id).activation_code).not_to be_nil
     end
 
     # TODO needs nesting/grouping, seems to have some duplication
@@ -65,16 +65,16 @@ if defined? ActiveRecord
     describe "event_and_save" do
       it "persists transitions" do
         user = User.create!(:name => 'name')
-        user.invite_and_save.should == true
-        User.find(user.id).should be_invited
-        User.find(user.id).activation_code.should_not be_nil
+        expect(user.invite_and_save).to eq(true)
+        expect(User.find(user.id)).to be_invited
+        expect(User.find(user.id).activation_code).not_to be_nil
       end
 
       it "persists transitions when using send and a symbol" do
         user = User.create!(:name => 'name')
-        user.send(:invite_and_save).should == true
-        User.find(user.id).should be_invited
-        User.find(user.id).activation_code.should_not be_nil
+        expect(user.send(:invite_and_save)).to eq(true)
+        expect(User.find(user.id)).to be_invited
+        expect(User.find(user.id).activation_code).not_to be_nil
       end
 
       it "raises an error if an invalid state_transition is called" do
@@ -87,19 +87,19 @@ if defined? ActiveRecord
 
       it "returns false and keeps state if record is invalid" do
         user = User.new
-        user.should be_new
-        user.should_not be_valid
-        user.invite_and_save.should == false
-        user.should be_new
+        expect(user).to be_new
+        expect(user).not_to be_valid
+        expect(user.invite_and_save).to eq(false)
+        expect(user).to be_new
       end
 
       it "returns false, keeps state and keeps errors if event adds errors" do
         user = User.create!(:name => 'name')
         user.invite_and_save!
-        user.should be_invited
-        user.confirm_invitation_and_save('x').should == false
-        user.should be_invited
-        Array(user.errors[:activation_code]).should == ['is invalid']
+        expect(user).to be_invited
+        expect(user.confirm_invitation_and_save('x')).to eq(false)
+        expect(user).to be_invited
+        expect(Array(user.errors[:activation_code])).to eq(['is invalid'])
       end
 
       it "rollsback if an exception is raised" do
@@ -110,15 +110,15 @@ if defined? ActiveRecord
             User.create! #this should raise an error
           end
         end
-        user_class.count.should == 0
+        expect(user_class.count).to eq(0)
         user = user_class.create!(:name => 'name')
         expect {
           user.transaction { user.invite_and_save }
         }.to raise_error(ActiveRecord::RecordInvalid,
                          "Validation failed: Name can't be blank")
-        user_class.count.should == 1
-        user_class.first.name.should == 'name'
-        user_class.first.should be_new
+        expect(user_class.count).to eq(1)
+        expect(user_class.first.name).to eq('name')
+        expect(user_class.first).to be_new
       end
 
       it "raises an error if an invalid state_transition is called" do
@@ -134,9 +134,9 @@ if defined? ActiveRecord
 
       it "persists transitions" do
         user = User.create!(:name => 'name')
-        user.invite_and_save!.should == true
-        User.find(user.id).should be_invited
-        User.find(user.id).activation_code.should_not be_nil
+        expect(user.invite_and_save!).to eq(true)
+        expect(User.find(user.id)).to be_invited
+        expect(User.find(user.id).activation_code).not_to be_nil
       end
 
       it "raises an error if an invalid state_transition is called" do
@@ -149,24 +149,24 @@ if defined? ActiveRecord
 
       it "raises a RecordInvalid and keeps state if record is invalid" do
         user = User.new
-        user.should be_new
-        user.should_not be_valid
+        expect(user).to be_new
+        expect(user).not_to be_valid
         expect {
           user.invite_and_save!
         }.to raise_error(ActiveRecord::RecordInvalid,
                          "Validation failed: Name can't be blank")
-        user.should be_new
+        expect(user).to be_new
       end
 
       it "raises a RecordInvalid and keeps state if event adds errors" do
         user = User.create!(:name => 'name')
         user.invite_and_save!
-        user.should be_invited
+        expect(user).to be_invited
         expect {
           user.confirm_invitation_and_save!('x')
         }.to raise_error(ActiveRecord::RecordInvalid,
                          "Validation failed: Activation code is invalid")
-        user.should be_invited
+        expect(user).to be_invited
       end
 
       it "rollsback if an exception is raised" do
@@ -177,15 +177,15 @@ if defined? ActiveRecord
             User.create! #this should raise an error
           end
         end
-        user_class.count.should == 0
+        expect(user_class.count).to eq(0)
         user = user_class.create!(:name => 'name')
         expect {
           user.transaction { user.invite_and_save! }
         }.to raise_error(ActiveRecord::RecordInvalid,
                          "Validation failed: Name can't be blank")
-        user_class.count.should == 1
-        user_class.first.name.should == 'name'
-        user_class.first.should be_new
+        expect(user_class.count).to eq(1)
+        expect(user_class.first.name).to eq('name')
+        expect(user_class.first).to be_new
       end
 
     end
@@ -193,18 +193,18 @@ if defined? ActiveRecord
     describe "event" do
       it "persists transitions" do
         user = User.create!(:name => 'name')
-        user.invite.should == true
-        User.find(user.id).should be_invited
-        User.find(user.id).activation_code.should_not be_nil
+        expect(user.invite).to eq(true)
+        expect(User.find(user.id)).to be_invited
+        expect(User.find(user.id).activation_code).not_to be_nil
       end
 
       it "returns false, keeps state and keeps errors if event adds errors" do
         user = User.create!(:name => 'name')
         user.invite_and_save!
-        user.should be_invited
-        user.confirm_invitation('x').should == false
-        user.should be_invited
-        Array(user.errors[:activation_code]).should == ['is invalid']
+        expect(user).to be_invited
+        expect(user.confirm_invitation('x')).to eq(false)
+        expect(user).to be_invited
+        expect(Array(user.errors[:activation_code])).to eq(['is invalid'])
       end
 
     end
@@ -213,17 +213,17 @@ if defined? ActiveRecord
 
       it "persists transitions" do
         user = User.create!(:name => 'name')
-        user.invite!.should == true
-        User.find(user.id).should be_invited
-        User.find(user.id).activation_code.should_not be_nil
+        expect(user.invite!).to eq(true)
+        expect(User.find(user.id)).to be_invited
+        expect(User.find(user.id).activation_code).not_to be_nil
       end
 
       it "raises a RecordInvalid and keeps state if record is invalid" do
         user = User.new
-        user.should be_new
-        user.should_not be_valid
+        expect(user).to be_new
+        expect(user).not_to be_valid
         expect { user.invite! }.to raise_error(ActiveRecord::RecordInvalid, "Validation failed: Name can't be blank")
-        user.should be_new
+        expect(user).to be_new
       end
 
     end
@@ -232,16 +232,16 @@ if defined? ActiveRecord
 
       it "persists transitions" do
         ticket = Ticket.create!
-        ticket.ssm_state.should == 'open'
-        ticket.close!.should == true
-        ticket.ssm_state.should == 'closed'
+        expect(ticket.ssm_state).to eq('open')
+        expect(ticket.close!).to eq(true)
+        expect(ticket.ssm_state).to eq('closed')
       end
 
       it "persists transitions with !" do
         ticket = Ticket.create!
-        ticket.ssm_state.should == 'open'
+        expect(ticket.ssm_state).to eq('open')
         ticket.close!
-        ticket.ssm_state.should == 'closed'
+        expect(ticket.ssm_state).to eq('closed')
       end
 
     end

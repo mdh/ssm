@@ -18,26 +18,26 @@ describe SimpleStateMachine::Decorator::Default do
 
     describe "#initialize" do
       it "defines a state_machine method" do
-        @instance.state_machine.should be_an(SimpleStateMachine::StateMachine)
+        expect(@instance.state_machine).to be_an(SimpleStateMachine::StateMachine)
       end
 
       it "defines a state getter method" do
-        @instance.should respond_to(:state)
+        expect(@instance).to respond_to(:state)
       end
 
       it "defines a state setter method" do
-        @instance.should respond_to(:state=)
+        expect(@instance).to respond_to(:state=)
       end
     end
 
     describe "#decorate" do
       it "defines state_helper_methods for both states" do
-        @instance.state1?.should  == true
-        @instance.state2?.should  == false
+        expect(@instance.state1?).to  eq(true)
+        expect(@instance.state2?).to  eq(false)
       end
 
       it "defines an event method" do
-        @instance.should respond_to(:event)
+        expect(@instance).to respond_to(:event)
       end
     end
   end
@@ -64,26 +64,26 @@ describe SimpleStateMachine::Decorator::Default do
 
     describe "#initialize" do
       it "defines a state_machine method" do
-        @instance.state_machine.should be_an(SimpleStateMachine::StateMachine)
+        expect(@instance.state_machine).to be_an(SimpleStateMachine::StateMachine)
       end
 
       it "defines a state getter method" do
-        @instance.should respond_to(:state)
+        expect(@instance).to respond_to(:state)
       end
 
       it "defines a state setter method" do
-        @instance.should respond_to(:state=)
+        expect(@instance).to respond_to(:state=)
       end
     end
 
     describe "#decorate" do
       it "does not overwrite predefined state_helper_methods" do
-        @instance.state1?.should  == "state1"
-        @instance.state2?.should  == "state2"
+        expect(@instance.state1?).to  eq("state1")
+        expect(@instance.state2?).to  eq("state2")
       end
 
       it "does not overwrite predefined event method" do
-        @instance.event.should == "predefined method"
+        expect(@instance.event).to eq("predefined method")
       end
     end
   end
@@ -111,22 +111,22 @@ describe SimpleStateMachine::Decorator::Default do
 
     describe "#initialize" do
       it "defines a state_machine method" do
-        @instance.state_machine.should be_an(SimpleStateMachine::StateMachine)
+        expect(@instance.state_machine).to be_an(SimpleStateMachine::StateMachine)
       end
 
       it "defines a state getter method" do
-        @instance.should respond_to(:state)
+        expect(@instance).to respond_to(:state)
       end
 
       it "defines a state setter method" do
-        @instance.should respond_to(:state=)
+        expect(@instance).to respond_to(:state=)
       end
     end
 
     describe "#decorate" do
       it "does not overwrite predefined protected state_helper_methods" do
-        @instance.send(:state1?).should  == "state1"
-        @instance.send(:state2?).should  == "state2"
+        expect(@instance.send(:state1?)).to  eq("state1")
+        expect(@instance.send(:state2?)).to  eq("state2")
       end
 
       it "keeps predefined protected state_helper_methods protected" do
@@ -135,7 +135,7 @@ describe SimpleStateMachine::Decorator::Default do
       end
 
       it "does not overwrite predefined protected event method" do
-        @instance.event.should == "predefined method"
+        expect(@instance.event).to eq("predefined method")
       end
     end
   end
@@ -163,22 +163,22 @@ describe SimpleStateMachine::Decorator::Default do
 
     describe "#initialize" do
       it "defines a state_machine method" do
-        @instance.state_machine.should be_an(SimpleStateMachine::StateMachine)
+        expect(@instance.state_machine).to be_an(SimpleStateMachine::StateMachine)
       end
 
       it "defines a state getter method" do
-        @instance.should respond_to(:state)
+        expect(@instance).to respond_to(:state)
       end
 
       it "defines a state setter method" do
-        @instance.should respond_to(:state=)
+        expect(@instance).to respond_to(:state=)
       end
     end
 
     describe "#decorate" do
       it "does not overwrite predefined private state_helper_methods" do
-        @instance.send(:state1?).should  == "state1"
-        @instance.send(:state2?).should  == "state2"
+        expect(@instance.send(:state1?)).to  eq("state1")
+        expect(@instance.send(:state2?)).to  eq("state2")
       end
 
       it "keeps predefined private state_helper_methods private" do
@@ -187,7 +187,7 @@ describe SimpleStateMachine::Decorator::Default do
       end
 
       it "does not overwrite predefined protected event method" do
-        @instance.event.should == "predefined method"
+        expect(@instance.event).to eq("predefined method")
       end
     end
   end

@@ -15,14 +15,14 @@ describe SimpleStateMachine::Tools::Graphviz do
 
   describe "#to_graphviz_dot" do
     it "converts to graphviz dot format" do
-      @smd.to_graphviz_dot.should ==  %(digraph G {\n"state1"->"state2"[label=event1];\n"state2"->"state3"[label=event1]\n})
+      expect(@smd.to_graphviz_dot).to eq(%(digraph G {\n"state1"->"state2"[label=event1];\n"state2"->"state3"[label=event1]\n}))
     end
   end
 
   describe "#google_chart_url" do
     it "shows the state and event dependencies as a Google chart" do
       graph = @smd.transitions.map { |t| t.to_graphviz_dot }.sort.join(";")
-      @smd.google_chart_url.should == "http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape graph}}"
+      expect(@smd.google_chart_url).to eq("http://chart.googleapis.com/chart?cht=gv&chl=digraph{#{::CGI.escape graph}}")
     end
   end
 end

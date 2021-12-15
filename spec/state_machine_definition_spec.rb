@@ -15,11 +15,11 @@ describe SimpleStateMachine::StateMachineDefinition do
 
   it "is inherited by subclasses" do
     subject = Class.new(klass).new
-    subject.should be_state1
+    expect(subject).to be_state1
     subject.event1
-    subject.should be_state2
+    expect(subject).to be_state2
     subject.event1
-    subject.should be_state3
+    expect(subject).to be_state3
   end
 
   describe '#state_method' do
@@ -39,23 +39,23 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "is used when changing state" do
-      subject.ssm_state.should == 'state1'
+      expect(subject.ssm_state).to eq('state1')
       subject.event1
-      subject.ssm_state.should == 'state2'
+      expect(subject.ssm_state).to eq('state2')
       subject.event2
-      subject.ssm_state.should == 'state3'
+      expect(subject.ssm_state).to eq('state3')
     end
 
     it "works with state helper methods" do
-      subject.should be_state1
+      expect(subject).to be_state1
       subject.event1
-      subject.should be_state2
+      expect(subject).to be_state2
       subject.event2
-      subject.should be_state3
+      expect(subject).to be_state3
     end
 
     it "raise an error if an invalid state_transition is called" do
-      lambda { subject.event2 }.should raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
+      expect { subject.event2 }.to raise_error(SimpleStateMachine::IllegalStateTransitionError, "You cannot 'event2' when state is 'state1'")
     end
 
   end
@@ -80,22 +80,22 @@ describe SimpleStateMachine::StateMachineDefinition do
     end
 
     it "is set when an error occurs during an event" do
-      subject.state.should == 'state1'
+      expect(subject.state).to eq('state1')
       subject.event1
-      subject.state.should == 'failed'
+      expect(subject.state).to eq('failed')
     end
   end
 
   describe "#transitions" do
     it "has a list of transitions" do
-      smd.transitions.should be_a(Array)
-      smd.transitions.first.should be_a(SimpleStateMachine::Transition)
+      expect(smd.transitions).to be_a(Array)
+      expect(smd.transitions.first).to be_a(SimpleStateMachine::Transition)
     end
   end
 
   describe "#to_s" do
     it "converts to readable string format" do
-      smd.to_s.should =~ Regexp.new("state1.event1! => state2")
+      expect(smd.to_s).to match(Regexp.new("state1.event1! => state2"))
     end
   end
 
