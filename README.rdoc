@@ -1,6 +1,6 @@
 = SimpleStateMachine
 
-{<img src="https://secure.travis-ci.org/mdh/ssm.png" />}[http://travis-ci.org/mdh/ssm]
+{<img src="https://github.com/mdh/ssm/actions/workflows/build.yml/badge.svg" />}[https://github.com/mdh/ssm/actions?query=workflow%3A.github%2Fworkflows%2Fbuild.yml+branch%3Amaster++]
 
 A simple DSL to decorate existing methods with state transition guards.
 
