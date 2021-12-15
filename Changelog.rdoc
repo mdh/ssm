@@ -1,3 +1,6 @@
+== 0.6.2
+- Use Dir.glob for gemspec instead of git ls-files [Petrik]
+
 == 0.6.1
 - Run against latest rubies and activerecord
 - Remove old rubygems version requirement
