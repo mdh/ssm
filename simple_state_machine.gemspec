@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
   s.executables      = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.rdoc_options     = ["--charset=UTF-8"]
   s.require_paths    = ["lib"]
-  s.rubygems_version = %q{1.3.7}
   s.summary          = %q{A simple DSL to decorate existing methods with logic that guards state transitions.}
   s.test_files       = `git ls-files -- {test,spec,features}/*`.split("\n")
 end
