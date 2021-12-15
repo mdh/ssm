@@ -1,7 +1,7 @@
 class TrafficLight
-  
+
   extend SimpleStateMachine
-  
+
   def initialize
     self.state = 'green'
   end
