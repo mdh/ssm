@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)  
-require "simple_state_machine/version"   
+$:.push File.expand_path("../lib", __FILE__)
+require "simple_state_machine/version"
 
 Gem::Specification.new do |s|
   s.name             = %q{simple_state_machine}
